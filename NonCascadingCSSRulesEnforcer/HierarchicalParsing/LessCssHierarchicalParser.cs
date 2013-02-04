@@ -15,7 +15,7 @@ namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 				throw new ArgumentNullException("segments");
 
 			var segmentEnumerator = segments.GetEnumerator();
-			var parsedData = ParseIntoStructuralData(segmentEnumerator, new WhiteSpaceNormalisedString[0], 0);
+			var parsedData = ParseIntoStructuralData(segmentEnumerator, new Selector.SelectorSet[0], 0);
 			while (segmentEnumerator.MoveNext())
 			{
 				var segment = segmentEnumerator.Current;
@@ -24,7 +24,7 @@ namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 				{
 					var lastFragment = parsedData.LastOrDefault();
 					var lastFragmentLineIndex = (lastFragment == null) ? 0 : lastFragment.SourceLineIndex;
-					throw new ArgumentException("Encountered unparsable data, this indicates content (after line " + (lastFragmentLineIndex + 1) + ")"); // TODO
+					throw new ArgumentException("Encountered unparsable data, this indicates content (after line " + (lastFragmentLineIndex + 1) + ")");
 				}
 			}
 			return parsedData;
@@ -32,7 +32,7 @@ namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 
 		public IEnumerable<ICSSFragment> ParseIntoStructuralData(
 			IEnumerator<CategorisedCharacterString> segmentEnumerator,
-			IEnumerable<WhiteSpaceNormalisedString> parentSelectors,
+			IEnumerable<Selector.SelectorSet> parentSelectors,
 			int sourceLineIndex)
 		{
 			if (segmentEnumerator == null)
@@ -72,19 +72,17 @@ namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 					case CharacterCategorisationOptions.OpenBrace:
 						if (selectorOrStyleContentBuffer.Length == 0)
 							throw new ArgumentException("Encountered OpenBrace with no preceding selector at line " + (sourceLineIndex + 1));
-						var selectorValue = new WhiteSpaceNormalisedString(selectorOrStyleContentBuffer.ToString());
+						var selectors = GetSelectorSet(selectorOrStyleContentBuffer.ToString());
 						fragments.Add(new Selector(
-							selectorValue,
+							selectors,
 							parentSelectors,
 							selectorOrStyleStartSourceLineIndex,
-							ParseIntoStructuralData(segmentEnumerator, parentSelectors.Concat(new[] { selectorValue }), sourceLineIndex)
+							ParseIntoStructuralData(segmentEnumerator, parentSelectors.Concat(new[] { selectors }), sourceLineIndex)
 						));
 						selectorOrStyleContentBuffer.Clear();
 						continue;
 
 					case CharacterCategorisationOptions.CloseBrace:
-						// TODO: Is this correct??!
-						// - Must be in a nested selector (assuming the content is valid)
 						if (selectorOrStyleContentBuffer.Length > 0)
 						{
 							fragments.Add(new StylePropertyName(
@@ -136,7 +134,7 @@ namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 			if (selectorOrStyleContentBuffer.Length > 0)
 			{
 				fragments.Add(new Selector(
-					new WhiteSpaceNormalisedString(selectorOrStyleContentBuffer.ToString()),
+					GetSelectorSet(selectorOrStyleContentBuffer.ToString()),
 					parentSelectors,
 					sourceLineIndex,
 					new ICSSFragment[0]
@@ -144,6 +142,20 @@ namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 			}
 
 			return fragments;
+		}
+
+		private Selector.SelectorSet GetSelectorSet(string selectors)
+		{
+			if (string.IsNullOrWhiteSpace(selectors))
+				throw new ArgumentException("Null/blank selectors specified");
+
+			return new Selector.SelectorSet(
+				selectors
+					.Split(',')
+					.Select(s => s.Trim())
+					.Where(s => s != "")
+					.Select(s => new Selector.WhiteSpaceNormalisedString(s))
+			);
 		}
 
 		private int GetNumberOfLineReturnsFromContentIfAny(string content)

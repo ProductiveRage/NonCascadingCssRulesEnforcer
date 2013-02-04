@@ -39,7 +39,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HierarchicalParsing\WhiteSpaceNormalisedString.cs" />
     <Compile Include="HierarchicalParsing\StylePropertyValue.cs" />
     <Compile Include="HierarchicalParsing\ICSSFragment.cs" />
     <Compile Include="HierarchicalParsing\LessCssHierarchicalParser.cs" />

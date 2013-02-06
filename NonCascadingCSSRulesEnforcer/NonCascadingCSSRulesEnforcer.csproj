@@ -39,6 +39,9 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HierarchicalParsing\Extensions\SelectorSet_Extensions.cs" />
+    <Compile Include="HierarchicalParsing\Extensions\IEnumerableICSSFragment_Extensions.cs" />
+    <Compile Include="HierarchicalParsing\Extensions\Selector_Extensions.cs" />
     <Compile Include="HierarchicalParsing\StylePropertyValue.cs" />
     <Compile Include="HierarchicalParsing\ICSSFragment.cs" />
     <Compile Include="HierarchicalParsing\LessCssHierarchicalParser.cs" />
@@ -46,6 +49,10 @@
     <Compile Include="HierarchicalParsing\StyleProperty.cs" />
     <Compile Include="HierarchicalParsing\StylePropertyName.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rules\BrokenRuleEncounteredException.cs" />
+    <Compile Include="Rules\BodyScopingMustBeAppliedToNonResetsOrThemesSheets.cs" />
+    <Compile Include="Rules\IEnforceRules.cs" />
+    <Compile Include="Rules\NoBareSelectorsInNonResetsOrThemeSheets.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

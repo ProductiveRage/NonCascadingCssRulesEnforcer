@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections;
 
 namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 {
@@ -62,10 +63,13 @@ namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 
 		public override string ToString()
 		{
-			return base.ToString() + ":" + string.Join(", ", Selectors.Selectors.Select(s => s.Value));
+			return base.ToString() + ":" + string.Join(", ", Selectors.Select(s => s.Value));
 		}
 
-		public class SelectorSet
+		/// <summary>
+		/// The set will always contain at least one item and none of them will be null references 
+		/// </summary>
+		public class SelectorSet : IEnumerable<WhiteSpaceNormalisedString>
 		{
 			private List<WhiteSpaceNormalisedString> _selectors;
 			public SelectorSet(IEnumerable<WhiteSpaceNormalisedString> selectors)
@@ -85,9 +89,16 @@ namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 			}
 
 			/// <summary>
-			/// This will never be null, empty nor contain any nulls
+			/// The enumerated data will never be empty nor contain any null references
 			/// </summary>
-			public IEnumerable<WhiteSpaceNormalisedString> Selectors { get { return _selectors.AsReadOnly(); } }
+			public IEnumerator<WhiteSpaceNormalisedString> GetEnumerator()
+			{
+				return _selectors.GetEnumerator();
+			}
+			IEnumerator System.Collections.IEnumerable.GetEnumerator()
+			{
+				return GetEnumerator();
+			}
 		}
 
 		public class WhiteSpaceNormalisedString
@@ -106,8 +117,8 @@ namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 			}
 
 			/// <summary>
-			/// All whitespace characters will be replaced with spaces, than any runs of spaces will be replaced with single instances, finally
-			/// the string will be trimmed. This will always have some content and never be null or blank.
+			/// All whitespace characters will have been replaced with spaces, then any runs of spaces replaced with single instances and finally
+			/// the string will have been trimmed. This will always have some content and never be null or blank.
 			/// </summary>
 			public string Value { get; private set; }
 

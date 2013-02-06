@@ -26,7 +26,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 					throw new ArgumentException("Null reference encountered in fragments set");
 
 				var selectorFragment = fragment as Selector;
-				if ((selectorFragment == null) || selectorFragment.Selectors.Any(s => s.Value != "body"))
+				if ((selectorFragment == null) || !selectorFragment.IsScopeRestrictingBodyTag())
 					throw new ScopeRestrictingBodyTagNotAppliedException(fragment);
 			}
 		}

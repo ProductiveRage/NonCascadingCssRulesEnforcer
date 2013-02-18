@@ -26,6 +26,14 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			Disallow
 		}
 
+		public bool DoesThisRuleApplyTo(StyleSheetTypeOptions styleSheetType)
+		{
+			if (!Enum.IsDefined(typeof(StyleSheetTypeOptions), styleSheetType))
+				throw new ArgumentOutOfRangeException("styleSheetType");
+
+			return ((styleSheetType != StyleSheetTypeOptions.Reset) && (styleSheetType != StyleSheetTypeOptions.Themes));
+		}
+
 		/// <summary>
 		/// This will throw an exception if the specified rule BrokenRuleEncounteredException is broken. It will throw an ArgumentException for a null fragments
 		/// references, or one which contains a null reference.
@@ -83,7 +91,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			public DisallowBareSelectorsEncounteredException(Selector selector)
 				: base(
 					string.Format(
-						"Disallow bare selector encountered (\"{0}\" at line {1})",
+						"Disallowed bare selector encountered (\"{0}\" at line {1})",
 						GetSelectorForDisplay(selector),
 						selector.SourceLineIndex + 1),
 					selector

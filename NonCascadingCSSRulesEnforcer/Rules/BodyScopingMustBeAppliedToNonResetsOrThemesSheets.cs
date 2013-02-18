@@ -11,6 +11,14 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 	/// </summary>
 	public class BodyScopingMustBeAppliedToNonResetsOrThemesSheets : IEnforceRules
 	{
+		public bool DoesThisRuleApplyTo(StyleSheetTypeOptions styleSheetType)
+		{
+			if (!Enum.IsDefined(typeof(StyleSheetTypeOptions), styleSheetType))
+				throw new ArgumentOutOfRangeException("styleSheetType");
+
+			return ((styleSheetType != StyleSheetTypeOptions.Reset) && (styleSheetType != StyleSheetTypeOptions.Themes));
+		}
+
 		/// <summary>
 		/// This will throw an exception if the specified rule BrokenRuleEncounteredException is broken. It will throw an ArgumentException for a null fragments
 		/// references, or one which contains a null reference.

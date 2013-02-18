@@ -10,5 +10,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// references, or one which contains a null reference.
 		/// </summary>
 		void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments);
+
+		bool DoesThisRuleApplyTo(StyleSheetTypeOptions styleSheetType);
 	}
 }

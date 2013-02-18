@@ -52,6 +52,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rules\BrokenRuleEncounteredException.cs" />
     <Compile Include="Rules\BodyScopingMustBeAppliedToNonResetsOrThemesSheets.cs" />
+    <Compile Include="Rules\StyleSheetTypeOptions.cs" />
+    <Compile Include="Rules\NoMediaQueriesInResetsAndThemeSheets.cs" />
+    <Compile Include="Rules\OnlyBareSelectorsInResetsAndThemeSheets.cs" />
     <Compile Include="Rules\IEnforceRules.cs" />
     <Compile Include="Rules\NoBareSelectorsInNonResetsOrThemeSheets.cs" />
   </ItemGroup>

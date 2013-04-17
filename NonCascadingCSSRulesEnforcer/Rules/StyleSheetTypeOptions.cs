@@ -2,8 +2,10 @@
 {
 	public enum StyleSheetTypeOptions
 	{
+		Compiled,
 		Other,
 		Reset,
-		Themes
+		Themes,
+		TopLevel
 	}
 }

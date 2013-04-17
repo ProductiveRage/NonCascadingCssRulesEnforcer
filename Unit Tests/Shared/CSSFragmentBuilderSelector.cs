@@ -85,10 +85,11 @@ namespace UnitTests.Shared
 			var styleProperty = source as CSSFragmentBuilderStyleProperty;
 			if (styleProperty != null)
 			{
+				var stylePropertyName = new StylePropertyName(styleProperty.Name, 0);
 				return new ICSSFragment[]
 				{
-					new StylePropertyName(styleProperty.Name, 0),
-					new StylePropertyValue(styleProperty.Value, 0)
+					stylePropertyName,
+					new StylePropertyValue(stylePropertyName, styleProperty.Value, 0)
 				};
 			}
 

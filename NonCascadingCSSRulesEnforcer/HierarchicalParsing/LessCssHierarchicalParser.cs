@@ -45,6 +45,7 @@ namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 			var fragments = new List<ICSSFragment>();
 			var selectorOrStyleContentBuffer = new StringBuilder();
 			var selectorOrStyleStartSourceLineIndex = -1;
+			StylePropertyName lastStylePropertyName = null;
 			while (segmentEnumerator.MoveNext())
 			{
 				var segment = segmentEnumerator.Current;
@@ -99,10 +100,11 @@ namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 							// Note: The SemiColon case here probably suggests invalid content, it should only follow a Value segment (ignoring
 							// Comments and WhiteSpace), so if there is anything in the selectorOrStyleContentBuffer before the SemiColon then
 							// it's probably not correct (but we're not validating for that here, we just don't want to throw anything away!)
-							fragments.Add(new StylePropertyName(
+							lastStylePropertyName = new StylePropertyName(
 								selectorOrStyleContentBuffer.ToString(),
 								selectorOrStyleStartSourceLineIndex
-							));
+							);
+							fragments.Add(lastStylePropertyName);
 							selectorOrStyleContentBuffer.Clear();
 						}
 						continue;
@@ -112,13 +114,17 @@ namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 						{
 							// This is presumably an error condition, there should be a colon between SelectorOrStyleProperty content and
 							// Value content, but we're not validating here so just lump it all together
-							fragments.Add(new StylePropertyName(
+							lastStylePropertyName = new StylePropertyName(
 								selectorOrStyleContentBuffer.ToString(),
 								selectorOrStyleStartSourceLineIndex
-							));
+							);
+							fragments.Add(lastStylePropertyName);
 							selectorOrStyleContentBuffer.Clear();
 						}
+						if (lastStylePropertyName == null)
+							throw new Exception("Invalid content, orphan style property value encountered");
 						fragments.Add(new StylePropertyValue(
+							lastStylePropertyName,
 							segment.Value,
 							selectorOrStyleStartSourceLineIndex
 						));

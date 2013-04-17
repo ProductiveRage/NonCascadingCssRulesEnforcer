@@ -1,6 +1,8 @@
-﻿using System.Linq;
-using CSSParser;
+﻿using System;
 using NonCascadingCSSRulesEnforcer.HierarchicalParsing;
+using NonCascadingCSSRulesEnforcer.Rules;
+using UnitTests.Rules;
+using UnitTests.Shared;
 
 namespace Tester
 {
@@ -8,11 +10,11 @@ namespace Tester
 	{
 		static void Main(string[] args)
 		{
-			var parsedData = (new LessCssHierarchicalParser()).ParseIntoStructuralData(
-				Parser.ParseLESS(
-					"// Comment\r\n\r\nbody, woo {\r\n  > h2 { font-weight: bold; }\r\n  color: black;\r\n}\r\n\r\nbody {\r\n  background: white;\r\n}\r\n"
-				).ToArray()
-			);
+			(new AllMeasurementsMustBePixelsTests()).HundredPercentageWidthImgsAreNotAcceptableIfNotNestedInPercentageWidthDivs();
+			(new AllMeasurementsMustBePixelsTests()).HundredPercentageWidthImgsMayBeAcceptableIfDeeplyNestedInPercentageWidthDivs();
+			(new AllMeasurementsMustBePixelsTests()).HundredPercentageWidthImgsMayBeAcceptableIfNestedInPercentageWidthDivs();
+			(new AllMeasurementsMustBePixelsTests()).NonHundredPercentageWidthImgsAreNotAcceptableIfNestedInPercentageWidthDivs();
+			(new AllMeasurementsMustBePixelsTests()).PercentageWidthDivsMayBeAcceptable();
 		}
 	}
 }

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CSSParser.ExtendedLESSParser;
 
-namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
+namespace NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions
 {
 	public static class IEnumerableICSSFragment_Extensions
 	{
@@ -23,18 +24,12 @@ namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 					throw new ArgumentException("Encountered null reference in fragments set");
 
 				var selectorFragment = fragment as Selector;
-				if (selectorFragment == null)
-				{
-					fragmentsWithoutMediaQueries.Add(fragment);
-					continue;
-				}
-
-				if (!selectorFragment.IsMediaQuery())
+				if (selectorFragment != null)
 				{
 					fragmentsWithoutMediaQueries.Add(
 						new Selector(
 							selectorFragment.Selectors,
-							selectorFragment.ParentSelectors.Where(s => !s.IndicatesMediaQuery()),
+							selectorFragment.ParentSelectors.Where(s => !s.First().Value.StartsWith("@media", StringComparison.InvariantCultureIgnoreCase)),
 							selectorFragment.SourceLineIndex,
 							RemoveMediaQueries(selectorFragment.ChildFragments)
 						)
@@ -42,9 +37,16 @@ namespace NonCascadingCSSRulesEnforcer.HierarchicalParsing
 					continue;
 				}
 
-				fragmentsWithoutMediaQueries.AddRange(
-					RemoveMediaQueries(selectorFragment.ChildFragments)
-				);
+				var mediaQueryFragment = fragment as MediaQuery;
+				if (mediaQueryFragment != null)
+				{
+					fragmentsWithoutMediaQueries.AddRange(
+						RemoveMediaQueries(mediaQueryFragment.ChildFragments)
+					);
+					continue;
+				}
+
+				fragmentsWithoutMediaQueries.Add(fragment);
 			}
 			return fragmentsWithoutMediaQueries;
 		}

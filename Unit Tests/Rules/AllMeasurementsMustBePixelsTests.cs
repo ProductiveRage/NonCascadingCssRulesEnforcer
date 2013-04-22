@@ -1,5 +1,4 @@
-﻿using NonCascadingCSSRulesEnforcer.HierarchicalParsing;
-using NonCascadingCSSRulesEnforcer.Rules;
+﻿using NonCascadingCSSRulesEnforcer.Rules;
 using UnitTests.Shared;
 using Xunit;
 
@@ -13,7 +12,7 @@ namespace UnitTests.Rules
 			var content = CSSFragmentBuilderSelector.New(
 				"div",
 				CSSFragmentBuilderStyleProperty.New("width", "50%")
-			).ToSelector();
+			).ToContainerFragment();
 
 			Assert.DoesNotThrow(() =>
 			{
@@ -31,7 +30,7 @@ namespace UnitTests.Rules
 					"img",
 					CSSFragmentBuilderStyleProperty.New("width", "100%")
 				)
-			).ToSelector();
+			).ToContainerFragment();
 
 			Assert.DoesNotThrow(() =>
 			{
@@ -52,7 +51,7 @@ namespace UnitTests.Rules
 						CSSFragmentBuilderStyleProperty.New("width", "100%")
 					)
 				)
-			).ToSelector();
+			).ToContainerFragment();
 
 			Assert.DoesNotThrow(() =>
 			{
@@ -66,7 +65,7 @@ namespace UnitTests.Rules
 			var content = CSSFragmentBuilderSelector.New(
 				"img",
 				CSSFragmentBuilderStyleProperty.New("width", "100%")
-			).ToSelector();
+			).ToContainerFragment();
 
 			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(
 				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content })
@@ -83,7 +82,7 @@ namespace UnitTests.Rules
 					"img",
 					CSSFragmentBuilderStyleProperty.New("width", "80%")
 				)
-			).ToSelector();
+			).ToContainerFragment();
 
 			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(
 				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content })

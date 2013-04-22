@@ -1,4 +1,4 @@
-﻿using NonCascadingCSSRulesEnforcer.HierarchicalParsing;
+﻿using CSSParser.ExtendedLESSParser;
 using NonCascadingCSSRulesEnforcer.Rules;
 using UnitTests.Shared;
 using Xunit;
@@ -21,7 +21,7 @@ namespace UnitTests.Rules
 		[Fact]
 		public void BodyTagWithNoNestedContentIsAcceptable()
 		{
-			var content = CSSFragmentBuilderSelector.New("body").ToSelector();
+			var content = CSSFragmentBuilderSelector.New("body").ToContainerFragment();
 
 			Assert.DoesNotThrow(() =>
 			{
@@ -35,7 +35,7 @@ namespace UnitTests.Rules
 			var content = CSSFragmentBuilderSelector.New(
 				"body",
 				CSSFragmentBuilderSelector.New("div")
-			).ToSelector();
+			).ToContainerFragment();
 
 			Assert.DoesNotThrow(() =>
 			{
@@ -49,7 +49,7 @@ namespace UnitTests.Rules
 			var content = CSSFragmentBuilderSelector.New(
 				"body",
 				CSSFragmentBuilderStyleProperty.New("color", "black")
-			).ToSelector();
+			).ToContainerFragment();
 
 			Assert.Throws<BodyScopingMustBeAppliedToNonResetsOrThemesSheets.ScopeRestrictingBodyTagNotAppliedException>(() =>
 			{
@@ -66,7 +66,7 @@ namespace UnitTests.Rules
 					"@media print",
 					CSSFragmentBuilderStyleProperty.New("color", "black")
 				)
-			).ToSelector();
+			).ToContainerFragment();
 
 			Assert.Throws<BodyScopingMustBeAppliedToNonResetsOrThemesSheets.ScopeRestrictingBodyTagNotAppliedException>(() =>
 			{

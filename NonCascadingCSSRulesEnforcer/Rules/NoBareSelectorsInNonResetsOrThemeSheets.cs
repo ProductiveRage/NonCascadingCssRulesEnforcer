@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using NonCascadingCSSRulesEnforcer.HierarchicalParsing;
+using CSSParser.ExtendedLESSParser;
+using NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions;
 
 namespace NonCascadingCSSRulesEnforcer.Rules
 {

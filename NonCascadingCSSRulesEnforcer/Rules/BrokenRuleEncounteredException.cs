@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using NonCascadingCSSRulesEnforcer.HierarchicalParsing;
+using CSSParser.ExtendedLESSParser;
 
 namespace NonCascadingCSSRulesEnforcer.Rules
 {

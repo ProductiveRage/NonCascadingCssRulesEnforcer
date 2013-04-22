@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using NonCascadingCSSRulesEnforcer.HierarchicalParsing;
+using CSSParser.ExtendedLESSParser;
 
 namespace NonCascadingCSSRulesEnforcer.Rules
 {

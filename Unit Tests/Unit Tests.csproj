@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CSSParser.ExtendedLESSParser">
+      <HintPath>..\External Dependencies\CSSParser\CSSParser.ExtendedLESSParser.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,7 +46,7 @@
     <Compile Include="Rules\BodyScopingMustBeAppliedToNonResetsOrThemesSheetsTests.cs" />
     <Compile Include="Rules\AllMeasurementsMustBePixelsTests.cs" />
     <Compile Include="Rules\NoBareSelectorsInNonResetsOrThemeSheetsTests.cs" />
-    <Compile Include="Shared\CSSFragmentBuilderSelector.cs" />
+    <Compile Include="Shared\CSSFragmentBuilderContainerFragment.cs" />
     <Compile Include="Shared\CSSFragmentBuilderStyleProperty.cs" />
     <Compile Include="Shared\ICSSFragmentBuilderComponent.cs" />
   </ItemGroup>

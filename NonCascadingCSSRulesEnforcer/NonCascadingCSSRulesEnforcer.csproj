@@ -35,20 +35,16 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\External Dependencies\CSSParser\CSSParser.dll</HintPath>
     </Reference>
+    <Reference Include="CSSParser.ExtendedLESSParser">
+      <HintPath>..\External Dependencies\CSSParser\CSSParser.ExtendedLESSParser.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HierarchicalParsing\Extensions\SelectorSet_Extensions.cs" />
-    <Compile Include="HierarchicalParsing\Extensions\IEnumerableICSSFragment_Extensions.cs" />
-    <Compile Include="HierarchicalParsing\Extensions\Selector_Extensions.cs" />
-    <Compile Include="HierarchicalParsing\StylePropertyValue.cs" />
-    <Compile Include="HierarchicalParsing\ICSSFragment.cs" />
-    <Compile Include="HierarchicalParsing\LessCssHierarchicalParser.cs" />
-    <Compile Include="HierarchicalParsing\Selector.cs" />
-    <Compile Include="HierarchicalParsing\StyleProperty.cs" />
-    <Compile Include="HierarchicalParsing\StylePropertyName.cs" />
+    <Compile Include="ExtendedLESSParserExtensions\IEnumerableICSSFragment_Extensions.cs" />
+    <Compile Include="ExtendedLESSParserExtensions\Selector_Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rules\BrokenRuleEncounteredException.cs" />
     <Compile Include="Rules\BodyScopingMustBeAppliedToNonResetsOrThemesSheets.cs" />

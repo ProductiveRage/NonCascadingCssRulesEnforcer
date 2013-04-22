@@ -30,15 +30,13 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 
 			foreach (var fragment in fragments)
 			{
-				// If the fragment isn't a selector then we're not interesting in it for this rule
 				var selectorFragment = fragment as Selector;
-				if (selectorFragment == null)
-					continue;
-
-				if (selectorFragment.Selectors.Any(s => !IsValidSelector(s)))
+				if ((selectorFragment != null) && (selectorFragment.Selectors.Any(s => !IsValidSelector(s))))
 					throw new OnlyAllowBareSelectorsEncounteredException(selectorFragment);
 
-				EnsureRulesAreMet(selectorFragment.ChildFragments);
+				var containerFragment = fragment as ContainerFragment;
+				if (containerFragment != null)
+					EnsureRulesAreMet(containerFragment.ChildFragments);
 			}
 		}
 
@@ -49,11 +47,6 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		{
 			if (cssSelector == null)
 				throw new ArgumentNullException("cssSelector");
-
-			// If it starts with a "@" then we'll assume it's a media query and let it through (whether or not media query content should be allow in
-			// a Reset-or-Themes sheet is a matter for another rule)
-			if (cssSelector.Value.StartsWith("@"))
-				return true;
 
 			return !cssSelector.Value.Contains('.') && !cssSelector.Value.Contains('#');
 		}

@@ -30,39 +30,37 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 
 			foreach (var fragment in fragments)
 			{
-				// If the fragment isn't a selector then we're not interesting in it for this rule
-				var selectorFragment = fragment as Selector;
-				if (selectorFragment == null)
-					continue;
+				var mediaQueryFragment = fragment as MediaQuery;
+				if (mediaQueryFragment != null)
+					throw new NoMediaQueriesAllowedException(mediaQueryFragment);
 
-				if (selectorFragment.Selectors.Any(s => s.Value.StartsWith("@")))
-					throw new NoMediaQueriesAllowedException(selectorFragment);
-
-				EnsureRulesAreMet(selectorFragment.ChildFragments);
+				var containerFragment = fragment as ContainerFragment;
+				if (containerFragment != null)
+					EnsureRulesAreMet(containerFragment.ChildFragments);
 			}
 		}
 
 		public class NoMediaQueriesAllowedException : BrokenRuleEncounteredException
 		{
-			public NoMediaQueriesAllowedException(Selector selector)
+			public NoMediaQueriesAllowedException(MediaQuery selector)
 				: base(
 					string.Format(
 						"Media query content encountered where it is invalid (\"{0}\" at line {1})",
-						GetSelectorForDisplay(selector),
+						GetMediaQuerySelectorForDisplay(selector),
 						selector.SourceLineIndex + 1),
 					selector
 				) { }
 
 			protected NoMediaQueriesAllowedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
-			private static string GetSelectorForDisplay(Selector selector)
+			private static string GetMediaQuerySelectorForDisplay(MediaQuery mediaQuery)
 			{
-				if (selector == null)
-					throw new ArgumentNullException("selector");
+				if (mediaQuery == null)
+					throw new ArgumentNullException("mediaQuery");
 
 				return string.Join(
 					", ",
-					selector.Selectors.Select(s => s.Value)
+					mediaQuery.Selectors.Select(s => s.Value)
 				);
 			}
 		}

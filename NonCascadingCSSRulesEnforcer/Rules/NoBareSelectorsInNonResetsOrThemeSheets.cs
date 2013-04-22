@@ -46,18 +46,21 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 
 			foreach (var fragment in fragments)
 			{
-				// If the fragment isn't a selector then we're not interesting in it for this rule
-				var selectorFragment = fragment as Selector;
-				if (selectorFragment == null)
+				var containerFragment = fragment as ContainerFragment;
+				if (containerFragment == null)
 					continue;
 
-				if (!selectorFragment.IsScopeRestrictingBodyTag() || (_scopeRestrictingBodyTagBehaviour == ScopeRestrictingBodyTagBehaviourOptions.Disallow))
+				var selectorFragment = fragment as Selector;
+				if (selectorFragment != null)
 				{
-					if (selectorFragment.Selectors.Any(s => !IsValidSelector(s)))
-						throw new DisallowBareSelectorsEncounteredException(selectorFragment);
+					if (!selectorFragment.IsScopeRestrictingBodyTag() || (_scopeRestrictingBodyTagBehaviour == ScopeRestrictingBodyTagBehaviourOptions.Disallow))
+					{
+						if (selectorFragment.Selectors.Any(s => !IsValidSelector(s)))
+							throw new DisallowBareSelectorsEncounteredException(selectorFragment);
+					}
 				}
 
-				EnsureRulesAreMet(selectorFragment.ChildFragments);
+				EnsureRulesAreMet(containerFragment.ChildFragments);
 			}
 		}
 
@@ -69,10 +72,6 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			if (cssSelector == null)
 				throw new ArgumentNullException("cssSelector");
 
-			// If it starts with a "@" then we'll assume it's a media query and let it through
-			if (cssSelector.Value.StartsWith("@"))
-				return true;
-
 			// Do some minor preprocessing to make it easier to break up, align any child selector with the following selector and away from the previous
 			// - We'll have to do a single replace-double-space-with-single-space in case we introduced a double space between a selector and a following
 			//   child selector symbol (eg. "div.Wrapper > h2" to "div.Wrapper  >h2") but that's the only whitespace concern since the whitespace has
@@ -81,7 +80,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			{
 				// If the segment has a child selector symbol or contains a class or an id then it's ok, if none of these conditions are met then the
 				// selector must be considered invalid (it is a bare selector)
-				if (!cssSelectorSegment.StartsWith(">") && !cssSelectorSegment.Contains(".") && !cssSelectorSegment.Contains("#") && !cssSelectorSegment.Contains("@"))
+				if (!cssSelectorSegment.StartsWith(">") && !cssSelectorSegment.Contains(".") && !cssSelectorSegment.Contains("#"))
 					return false;
 			}
 			return true;

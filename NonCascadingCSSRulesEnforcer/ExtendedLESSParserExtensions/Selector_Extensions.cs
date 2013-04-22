@@ -43,7 +43,7 @@ namespace NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions
 					continue;
 				}
 
-				if (childFragment is Selector)
+				if ((childFragment is Selector) || (childFragment is MediaQuery))
 				{
 					previousFragmentWasLESSValue = false;
 					continue;

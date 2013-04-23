@@ -101,5 +101,18 @@ namespace UnitTests.Rules
 				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content })
 			);
 		}
+
+		[Fact]
+		public void BorderMayNotSpecifyWidthAsThick()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"div",
+				CSSFragmentBuilderStyleProperty.New("border", "thick solid black")
+			).ToContainerFragment();
+
+			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(
+				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content })
+			);
+		}
 	}
 }

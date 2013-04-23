@@ -6,7 +6,9 @@ using CSSParser.ExtendedLESSParser;
 namespace NonCascadingCSSRulesEnforcer.Rules
 {
 	/// <summary>
-	/// TODO
+	/// This performs the shared work of the BorderWidthMustBeFullySpecifiedIfSpecifiedAtAll, MarginMustBeFullySpecifiedIfSpecifiedAtAll and PaddingMustBeFullySpecifiedIfSpecifiedAtAll
+	/// rules - it is used to ensure that none of these measurements are partially specified (eg. "padding-left" may not appear on its own, either all padding values must be specified
+	/// with the use of "padding" and then the "padding-left" being used to override that, or the "padding-top", "padding-bottom" and "padding-right" properties must also be present)
 	/// </summary>
 	public abstract class PropertyMustBeFullySpecifiedIfSpecifiedAtAll : IEnforceRules
 	{

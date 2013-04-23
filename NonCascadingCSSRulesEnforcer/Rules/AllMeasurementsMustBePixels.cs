@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using CSSParser;
 using CSSParser.ExtendedLESSParser;
+using NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions;
 
 namespace NonCascadingCSSRulesEnforcer.Rules
 {
@@ -65,7 +64,6 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			if (containers == null)
 				throw new ArgumentNullException("containers");
 
-			StylePropertyName stylePropertyName = null;
 			foreach (var fragment in fragments)
 			{
 				if (fragment == null)
@@ -78,15 +76,12 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 					continue;
 				}
 
-				if (fragment is StylePropertyName)
-					stylePropertyName = (StylePropertyName)fragment;
-
 				var stylePropertyValueFragment = fragment as StylePropertyValue;
 				if (stylePropertyValueFragment == null)
 					continue;
 
 				// Generic tests for measurement units
-				var stylePropertyValueFragmentSections = GetPropertyValueSections(stylePropertyValueFragment.Value);
+				var stylePropertyValueFragmentSections = stylePropertyValueFragment.GetValueSections();
 				foreach (var value in stylePropertyValueFragmentSections)
 				{
 					if (_conformity == ConformityOptions.AllowPercentageWidthDivs)
@@ -140,60 +135,23 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				}
 
 				// Specific tests for disallowed measurement types
-				if (stylePropertyName != null)
+				// - Border widths must be explicitly specified, use of "thin", "medium" or "thick" are not allowed
+				var stylePropertyNameValue = stylePropertyValueFragment.Property.Value.ToLower();
+				if ((stylePropertyNameValue == "border") || stylePropertyNameValue.StartsWith("border-"))
 				{
-					// Border widths must be explicitly specified, use of "thin", "medium" or "thick" are not allowed
-					var stylePropertyNameValue = stylePropertyName.Value.ToLower();
-					if ((stylePropertyNameValue == "border") || stylePropertyNameValue.StartsWith("border-"))
+					if (stylePropertyValueFragmentSections.Any(s =>
+						s.Equals("thin", StringComparison.InvariantCultureIgnoreCase) ||
+						s.Equals("medium", StringComparison.InvariantCultureIgnoreCase) ||
+						s.Equals("thick", StringComparison.InvariantCultureIgnoreCase)
+					))
 					{
-						if (stylePropertyValueFragmentSections.Any(s =>
-							s.Equals("thin", StringComparison.InvariantCultureIgnoreCase) ||
-							s.Equals("medium", StringComparison.InvariantCultureIgnoreCase) ||
-							s.Equals("thick", StringComparison.InvariantCultureIgnoreCase)
-						))
-						{
-							throw new AllMeasurementsMustBePixelsNotAppliedException(fragment);
-						}
+						throw new AllMeasurementsMustBePixelsNotAppliedException(fragment);
 					}
 				}
 			}
 		}
 
-		/// <summary>
-		/// Taken from http://www.w3.org/TR/css3-values/#font-relative-lengths (all values except "px")
-		/// </summary>
-		private static readonly string[] DisallowedMeasurementUnits = new[] { "em", "ex", "ch", "rem", "vw", "vh", "vmin", "vmax", "cm", "mm", "in", "pt", "pc", "%" };
-
-		/// <summary>
-		/// Break a property value into sections - eg. "3px solid black" into [ "3px", "solid", "black" ] or "white url('test.png') top left no-repeat" into [ "white",
-		/// "url('test.png')", "top", "left", "no-repeat" ]. This will never return null nor a set containing any null or blank values.
-		/// </summary>
-		private IEnumerable<string> GetPropertyValueSections(string value)
-		{
-			if (value == null)
-				throw new ArgumentNullException("value");
-
-			// The CSSParser has to deal with quoting of values so we can use it here - given a property value it should return a set of sections where the only
-			// CharacterCategorisation values are Whitespace and Value, any whitespace within a quoted value will be identified as Value, not Whitespace
-			var sections = new List<string>();
-			var buffer = new StringBuilder();
-			foreach (var section in Parser.ParseCSS(value))
-			{
-				if (section.CharacterCategorisation == CSSParser.ContentProcessors.CharacterCategorisationOptions.Whitespace)
-				{
-					if (buffer.Length > 0)
-					{
-						sections.Add(buffer.ToString());
-						buffer.Clear();
-					}
-				}
-				else
-					buffer.Append(section.Value);
-			}
-			if (buffer.Length > 0)
-				sections.Add(buffer.ToString());
-			return sections;
-		}
+		private static readonly string[] DisallowedMeasurementUnits = Constants.MeasurementUnits.Except(new[] { "px" }).ToArray();
 
 		private bool DoesSelectorTargetOnlyElementsWithTagName(Selector parentSelector, string tagName)
 		{

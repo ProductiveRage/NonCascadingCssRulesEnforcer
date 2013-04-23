@@ -5,17 +5,18 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 {
 	/// <summary>
 	/// This rule applies to all stylesheets. It is very similar to the checks for fully specified margins and padding except that the important aspect of border properties are
-	/// the widths and these may be specified in multiple way - eg. "border", "border-width", "border-top", "border-width-top". If any border width is specified then they all
+	/// the widths and these may be specified in multiple way - eg. "border", "border-width", "border-top", "border-top-width". If any border width is specified then they all
 	/// must be, one way or another.
 	/// </summary>
 	public class BorderWidthMustBeFullySpecifiedIfSpecifiedAtAll : PropertyMustBeFullySpecifiedIfSpecifiedAtAll
 	{
+		// TODO: Deal with "border-[top|left|bottom|right]"
 		public BorderWidthMustBeFullySpecifiedIfSpecifiedAtAll()
 			: base(
-				new[] { "border-top", "border-width-top" },
-				new[] { "border-left", "border-width-left" },
-				new[] { "border-bottom", "border-width-bottom" },
-				new[] { "border-right", "border-width-right" },
+				new[] { "border-top", "border-top-width" },
+				new[] { "border-left", "border-left-width" },
+				new[] { "border-bottom", "border-bottom-width" },
+				new[] { "border-right", "border-right-width" },
 				new[] { "border", "border-width" },
 				fragment => new BorderWidthMustBeFullySpecifiedIfSpecifiedAtAllException(fragment)
 			) { }

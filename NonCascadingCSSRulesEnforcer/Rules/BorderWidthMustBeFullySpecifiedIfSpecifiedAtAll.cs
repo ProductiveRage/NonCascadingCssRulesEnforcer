@@ -10,7 +10,6 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 	/// </summary>
 	public class BorderWidthMustBeFullySpecifiedIfSpecifiedAtAll : PropertyMustBeFullySpecifiedIfSpecifiedAtAll
 	{
-		// TODO: Deal with "border-[top|left|bottom|right]"
 		public BorderWidthMustBeFullySpecifiedIfSpecifiedAtAll()
 			: base(
 				new[] { "border-top", "border-top-width" },

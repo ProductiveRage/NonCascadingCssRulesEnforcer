@@ -1,8 +1,4 @@
-﻿using System;
-using NonCascadingCSSRulesEnforcer.HierarchicalParsing;
-using NonCascadingCSSRulesEnforcer.Rules;
-using UnitTests.Rules;
-using UnitTests.Shared;
+﻿using UnitTests.Rules;
 
 namespace Tester
 {

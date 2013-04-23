@@ -45,7 +45,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rules\BodyScopingMustBeAppliedToNonResetsOrThemesSheetsTests.cs" />
     <Compile Include="Rules\AllMeasurementsMustBePixelsTests.cs" />
-    <Compile Include="Rules\MarginsMustBeFullySpecifiedIfSpecifiedAtAllTests.cs" />
+    <Compile Include="Rules\PaddingMustBeFullySpecifiedIfSpecifiedAtAllTests.cs" />
+    <Compile Include="Rules\MarginMustBeFullySpecifiedIfSpecifiedAtAllTests.cs" />
     <Compile Include="Rules\NoBareSelectorsInNonResetsOrThemeSheetsTests.cs" />
     <Compile Include="Shared\CSSFragmentBuilderContainerFragment.cs" />
     <Compile Include="Shared\CSSFragmentBuilderStyleProperty.cs" />

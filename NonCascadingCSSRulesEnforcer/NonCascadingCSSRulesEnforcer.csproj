@@ -49,7 +49,9 @@
     <Compile Include="Rules\BrokenRuleEncounteredException.cs" />
     <Compile Include="Rules\BodyScopingMustBeAppliedToNonResetsOrThemesSheets.cs" />
     <Compile Include="Rules\AllMeasurementsMustBePixels.cs" />
-    <Compile Include="Rules\MarginsMustBeFullySpecifiedIfSpecifiedAtAll.cs" />
+    <Compile Include="Rules\PaddingMustBeFullySpecifiedIfSpecifiedAtAll.cs" />
+    <Compile Include="Rules\PropertyMustBeFullySpecifiedIfSpecifiedAtAll.cs" />
+    <Compile Include="Rules\MarginMustBeFullySpecifiedIfSpecifiedAtAll.cs" />
     <Compile Include="Rules\StyleSheetTypeOptions.cs" />
     <Compile Include="Rules\NoMediaQueriesInResetsAndThemeSheets.cs" />
     <Compile Include="Rules\OnlyBareSelectorsInResetsAndThemeSheets.cs" />

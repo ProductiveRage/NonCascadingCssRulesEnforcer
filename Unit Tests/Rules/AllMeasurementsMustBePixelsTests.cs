@@ -88,5 +88,18 @@ namespace UnitTests.Rules
 				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content })
 			);
 		}
+
+		[Fact]
+		public void CombinedBorderPropertyValueMayNotUseEms()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"div",
+				CSSFragmentBuilderStyleProperty.New("border", "0.5em solid black")
+			).ToContainerFragment();
+
+			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(
+				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content })
+			);
+		}
 	}
 }

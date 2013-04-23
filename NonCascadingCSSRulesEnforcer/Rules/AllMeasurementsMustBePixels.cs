@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text;
+using CSSParser;
 using CSSParser.ExtendedLESSParser;
 
 namespace NonCascadingCSSRulesEnforcer.Rules
@@ -83,54 +85,56 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				if (stylePropertyValueFragment == null)
 					continue;
 
-				var value = stylePropertyValueFragment.Value;
-				if (_conformity == ConformityOptions.AllowPercentageWidthDivs)
+				foreach (var value in GetPropertyValueSections(stylePropertyValueFragment.Value))
 				{
-					// If ConformityOptions.AllowPercentageWidthDivs was specified then allow div elements to have a percentage width and for img elements within those
-					// divs (the style must be declared nested within the div style as supported by LESS, it is not sufficient
-					// - See http://www.productiverage.com/Read/46 for justification for allowing the relaxation of this rule
-					// - The HTML5 "section" element should have semantic meaning, "div" is still appropriate as a container if no semantic meaning is attached, as such
-					//   it is acceptable that only div wrappers may have "width:100%" (see http://webdesign.about.com/od/html5tags/a/when-to-use-section-element.htm
-					//   and http://html5doctor.com/you-can-still-use-div)
-					var directParentSelector = containers.LastOrDefault() as Selector;
-					if ((directParentSelector != null)
-					&& stylePropertyValueFragment.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase)
-					&& value.EndsWith("%", StringComparison.InvariantCultureIgnoreCase))
+					if (_conformity == ConformityOptions.AllowPercentageWidthDivs)
 					{
-						// If the selector for this property targets divs only (eg. "div.Main" or "div.Header div.Logo, div.Footer div.Logo") then allow percentage widths
-						if (DoesSelectorTargetOnlyElementsWithTagName(directParentSelector, "div"))
-							continue;
-
-						// If the selector for this property targets imgs only then allow "width:100%" values so long as they are inside a div with a percentage width
-						if (DoesSelectorTargetOnlyElementsWithTagName(directParentSelector, "img"))
+						// If ConformityOptions.AllowPercentageWidthDivs was specified then allow div elements to have a percentage width and for img elements within those
+						// divs (the style must be declared nested within the div style as supported by LESS, it is not sufficient
+						// - See http://www.productiverage.com/Read/46 for justification for allowing the relaxation of this rule
+						// - The HTML5 "section" element should have semantic meaning, "div" is still appropriate as a container if no semantic meaning is attached, as such
+						//   it is acceptable that only div wrappers may have "width:100%" (see http://webdesign.about.com/od/html5tags/a/when-to-use-section-element.htm
+						//   and http://html5doctor.com/you-can-still-use-div)
+						var directParentSelector = containers.LastOrDefault() as Selector;
+						if ((directParentSelector != null)
+						&& stylePropertyValueFragment.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase)
+						&& value.EndsWith("%", StringComparison.InvariantCultureIgnoreCase))
 						{
-							if (value.EndsWith("%"))
-							{
-								if (value != "100%")
-									throw new AllMeasurementsMustBePixelsNotAppliedException("The only allow percentage width for img is 100%", fragment);
+							// If the selector for this property targets divs only (eg. "div.Main" or "div.Header div.Logo, div.Footer div.Logo") then allow percentage widths
+							if (DoesSelectorTargetOnlyElementsWithTagName(directParentSelector, "div"))
+								continue;
 
-								if (containers
-									.Where(s => (s is Selector) && DoesSelectorTargetOnlyElementsWithTagName((Selector)s, "div"))
-									.SelectMany(s => s.ChildFragments)
-									.Where(f => f is StylePropertyValue)
-									.Cast<StylePropertyValue>()
-									.Where(s => s.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase) && s.Value.EndsWith("%"))
-									.Any())
+							// If the selector for this property targets imgs only then allow "width:100%" values so long as they are inside a div with a percentage width
+							if (DoesSelectorTargetOnlyElementsWithTagName(directParentSelector, "img"))
+							{
+								if (value.EndsWith("%"))
+								{
+									if (value != "100%")
+										throw new AllMeasurementsMustBePixelsNotAppliedException("The only allow percentage width for img is 100%", fragment);
+
+									if (containers
+										.Where(s => (s is Selector) && DoesSelectorTargetOnlyElementsWithTagName((Selector)s, "div"))
+										.SelectMany(s => s.ChildFragments)
+										.Where(f => f is StylePropertyValue)
+										.Cast<StylePropertyValue>()
+										.Where(s => s.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase) && s.Value.EndsWith("%"))
+										.Any())
 										continue;
-								
-								throw new AllMeasurementsMustBePixelsNotAppliedException("Percentage width for img may is only allowable if nested within a div style with percentage width (and the img must have width:100%)", fragment);
+
+									throw new AllMeasurementsMustBePixelsNotAppliedException("Percentage width for img may is only allowable if nested within a div style with percentage width (and the img must have width:100%)", fragment);
+								}
 							}
 						}
 					}
-				}
-				foreach (var disallowedMeasurementUnit in DisallowedMeasurementUnits)
-				{
-					if (!value.EndsWith(disallowedMeasurementUnit, StringComparison.InvariantCultureIgnoreCase))
-						continue;
+					foreach (var disallowedMeasurementUnit in DisallowedMeasurementUnits)
+					{
+						if (!value.EndsWith(disallowedMeasurementUnit, StringComparison.InvariantCultureIgnoreCase))
+							continue;
 
-					float numericValue;
-					if (float.TryParse(value.Substring(0, value.Length - disallowedMeasurementUnit.Length).Trim(), out numericValue))
-						throw new AllMeasurementsMustBePixelsNotAppliedException(fragment);
+						float numericValue;
+						if (float.TryParse(value.Substring(0, value.Length - disallowedMeasurementUnit.Length).Trim(), out numericValue))
+							throw new AllMeasurementsMustBePixelsNotAppliedException(fragment);
+					}
 				}
 			}
 		}
@@ -139,6 +143,37 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// Taken from http://www.w3.org/TR/css3-values/#font-relative-lengths (all values except "px")
 		/// </summary>
 		private static readonly string[] DisallowedMeasurementUnits = new[] { "em", "ex", "ch", "rem", "vw", "vh", "vmin", "vmax", "cm", "mm", "in", "pt", "pc", "%" };
+
+		/// <summary>
+		/// Break a property value into sections - eg. "3px solid black" into [ "3px", "solid", "black" ] or "white url('test.png') top left no-repeat" into [ "white",
+		/// "url('test.png')", "top", "left", "no-repeat" ]. This will never return null nor a set containing any null or blank values.
+		/// </summary>
+		private IEnumerable<string> GetPropertyValueSections(string value)
+		{
+			if (value == null)
+				throw new ArgumentNullException("value");
+
+			// The CSSParser has to deal with quoting of values so we can use it here - given a property value it should return a set of sections where the only
+			// CharacterCategorisation values are Whitespace and Value, any whitespace within a quoted value will be identified as Value, not Whitespace
+			var sections = new List<string>();
+			var buffer = new StringBuilder();
+			foreach (var section in Parser.ParseCSS(value))
+			{
+				if (section.CharacterCategorisation == CSSParser.ContentProcessors.CharacterCategorisationOptions.Whitespace)
+				{
+					if (buffer.Length > 0)
+					{
+						sections.Add(buffer.ToString());
+						buffer.Clear();
+					}
+				}
+				else
+					buffer.Append(section.Value);
+			}
+			if (buffer.Length > 0)
+				sections.Add(buffer.ToString());
+			return sections;
+		}
 
 		private bool DoesSelectorTargetOnlyElementsWithTagName(Selector parentSelector, string tagName)
 		{

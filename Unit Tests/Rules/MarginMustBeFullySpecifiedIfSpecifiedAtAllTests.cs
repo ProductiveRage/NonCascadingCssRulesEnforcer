@@ -4,7 +4,7 @@ using Xunit;
 
 namespace UnitTests.Rules
 {
-	public class MarginsMustBeFullySpecifiedIfSpecifiedAtAllTests
+	public class MarginMustBeFullySpecifiedIfSpecifiedAtAllTests
 	{
 		[Fact]
 		public void NoMarginAtAllIsAcceptable()
@@ -13,7 +13,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new MarginsMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
+				(new MarginMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -27,7 +27,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new MarginsMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
+				(new MarginMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -44,7 +44,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new MarginsMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
+				(new MarginMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -59,7 +59,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new MarginsMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
+				(new MarginMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -71,9 +71,9 @@ namespace UnitTests.Rules
 				CSSFragmentBuilderStyleProperty.New("margin-top", "16px")
 			).ToContainerFragment();
 
-			Assert.Throws<MarginsMustBeFullySpecifiedIfSpecifiedAtAll.MarginsMustBeFullySpecifiedIfSpecifiedAtAllException>(() =>
+			Assert.Throws<MarginMustBeFullySpecifiedIfSpecifiedAtAll.MarginMustBeFullySpecifiedIfSpecifiedAtAllException>(() =>
 			{
-				(new MarginsMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
+				(new MarginMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
 			});
 		}
 	}

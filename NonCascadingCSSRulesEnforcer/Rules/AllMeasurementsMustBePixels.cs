@@ -85,7 +85,9 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				if (stylePropertyValueFragment == null)
 					continue;
 
-				foreach (var value in GetPropertyValueSections(stylePropertyValueFragment.Value))
+				// Generic tests for measurement units
+				var stylePropertyValueFragmentSections = GetPropertyValueSections(stylePropertyValueFragment.Value);
+				foreach (var value in stylePropertyValueFragmentSections)
 				{
 					if (_conformity == ConformityOptions.AllowPercentageWidthDivs)
 					{
@@ -134,6 +136,24 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 						float numericValue;
 						if (float.TryParse(value.Substring(0, value.Length - disallowedMeasurementUnit.Length).Trim(), out numericValue))
 							throw new AllMeasurementsMustBePixelsNotAppliedException(fragment);
+					}
+				}
+
+				// Specific tests for disallowed measurement types
+				if (stylePropertyName != null)
+				{
+					// Border widths must be explicitly specified, use of "thin", "medium" or "thick" are not allowed
+					var stylePropertyNameValue = stylePropertyName.Value.ToLower();
+					if ((stylePropertyNameValue == "border") || stylePropertyNameValue.StartsWith("border-"))
+					{
+						if (stylePropertyValueFragmentSections.Any(s =>
+							s.Equals("thin", StringComparison.InvariantCultureIgnoreCase) ||
+							s.Equals("medium", StringComparison.InvariantCultureIgnoreCase) ||
+							s.Equals("thick", StringComparison.InvariantCultureIgnoreCase)
+						))
+						{
+							throw new AllMeasurementsMustBePixelsNotAppliedException(fragment);
+						}
 					}
 				}
 			}

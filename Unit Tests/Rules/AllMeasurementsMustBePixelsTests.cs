@@ -60,6 +60,28 @@ namespace UnitTests.Rules
 		}
 
 		[Fact]
+		public void HundredPercentageWidthImgsMayBeAcceptableIfPercentageWidthAppliedToDivsInMediaQuery()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"div",
+				CSSFragmentBuilderStyleProperty.New("width", "500px"),
+				CSSFragmentBuilderSelector.New(
+					"@media screen and (max-width:70em)",
+					CSSFragmentBuilderStyleProperty.New("width", "50%"),
+					CSSFragmentBuilderSelector.New(
+						"img",
+						CSSFragmentBuilderStyleProperty.New("width", "100%")
+					)
+				)
+			).ToContainerFragment();
+
+			Assert.DoesNotThrow(() =>
+			{
+				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content });
+			});
+		}
+
+		[Fact]
 		public void HundredPercentageWidthImgsAreNotAcceptableIfNotNestedInPercentageWidthDivs()
 		{
 			var content = CSSFragmentBuilderSelector.New(

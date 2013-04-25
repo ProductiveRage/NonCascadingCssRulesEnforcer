@@ -92,7 +92,14 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 						// - The HTML5 "section" element should have semantic meaning, "div" is still appropriate as a container if no semantic meaning is attached, as such
 						//   it is acceptable that only div wrappers may have "width:100%" (see http://webdesign.about.com/od/html5tags/a/when-to-use-section-element.htm
 						//   and http://html5doctor.com/you-can-still-use-div)
-						var directParentSelector = containers.LastOrDefault() as Selector;
+						
+						// To get the parent Selector we have to walk backwards up the containers set since this property value could be wrapped in a MediaQuery - eg.
+						// div.Whatever {
+						//   @media screen and (max-width:70em) {
+						//     width: 50%;
+						//   }
+						// }
+						var directParentSelector = containers.LastOrDefault(c => c is Selector) as Selector;
 						if ((directParentSelector != null)
 						&& stylePropertyValueFragment.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase)
 						&& value.EndsWith("%", StringComparison.InvariantCultureIgnoreCase))
@@ -109,16 +116,25 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 									if (value != "100%")
 										throw new AllMeasurementsMustBePixelsNotAppliedException("The only allow percentage width for img is 100%", fragment);
 
-									if (containers
-										.Where(s => (s is Selector) && DoesSelectorTargetOnlyElementsWithTagName((Selector)s, "div"))
+									// We only need to ensure that the img is nested within an element with a percentage width, we don't have to worry about ensuring that
+									// the selector targets div elements only since this is handled by the above check (that percentage-width styles only target divs)
+									// - Technically this would allow "div.Content { width: 50%; img { width: 100%; img { width: 100%; } } }" but that's not an error case
+									//   since the img tags are still 100% and inside a div with percentage width (it's probably not valid for img tags to be nested but
+									//   that's not a concern for this class)
+									var firstContainerWithPercentageWidth = containers
+										.TakeWhile(c => c != directParentSelector)
 										.SelectMany(s => s.ChildFragments)
 										.Where(f => f is StylePropertyValue)
 										.Cast<StylePropertyValue>()
 										.Where(s => s.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase) && s.Value.EndsWith("%"))
-										.Any())
+										.FirstOrDefault();
+									if (firstContainerWithPercentageWidth != null)
 										continue;
 
-									throw new AllMeasurementsMustBePixelsNotAppliedException("Percentage width for img may is only allowable if nested within a div style with percentage width (and the img must have width:100%)", fragment);
+									throw new AllMeasurementsMustBePixelsNotAppliedException(
+										"Percentage width for img may is only allowable if nested within a div style with percentage width (and the img must have width:100%)",
+										fragment
+									);
 								}
 							}
 						}

@@ -36,9 +36,15 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 					continue;
 
 				// If a width is specified..
-				var isWidthDefined = containerFragment.ChildFragments.Any(
-					f => (f is StylePropertyName) && ((StylePropertyName)f).Value.Equals("width", StringComparison.InvariantCultureIgnoreCase)
-				);
+				// - Although there could be multiple "width" properties specified, in which case only the last would be applied by the browser, this is not
+				//   a case I'm interested in supporting since there should be only a single width property (if any) for the sake of clarity (only need to
+				//   consider ones that have measurement values since they will either have a measurement value or be "auto" or "inherit" or invalid,
+				//   the last three of which we don't have to worry about)
+				var isWidthDefined = containerFragment.ChildFragments
+					.Where(f => (f is StylePropertyValue))
+					.Cast<StylePropertyValue>()
+					.Where(s => s.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase))
+					.Any(s => s.GetValueSectionsThatAreMeasurements().Any());
 				if (isWidthDefined)
 				{
 					// .. and a padding or border other than zero (which is checked for explicitly while a border value of "none" is ignored entirely)..

@@ -21,6 +21,21 @@ namespace UnitTests.Rules
 		}
 
 		[Fact]
+		public void PaddingWithWidthAutoIsFine()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"div",
+				CSSFragmentBuilderStyleProperty.New("padding", "16px"),
+				CSSFragmentBuilderStyleProperty.New("width", "auto")
+			).ToContainerFragment();
+
+			Assert.DoesNotThrow(() =>
+			{
+				(new BorderAndPaddingMayNotBeCombinedWithWidth()).EnsureRulesAreMet(new[] { content });
+			});
+		}
+
+		[Fact]
 		public void WidthOnlyIsFine()
 		{
 			var content = CSSFragmentBuilderSelector.New(

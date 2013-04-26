@@ -5,7 +5,6 @@
 		Compiled,
 		Other,
 		Reset,
-		Themes,
-		TopLevel
+		Themes
 	}
 }

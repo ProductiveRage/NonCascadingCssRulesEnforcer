@@ -11,6 +11,26 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 	/// </summary>
 	public class OnlyBareSelectorsInResetsAndThemeSheets : IEnforceRules
 	{
+		private readonly ConformityOptions _conformity;
+		public OnlyBareSelectorsInResetsAndThemeSheets(ConformityOptions conformity)
+		{
+			if (!Enum.IsDefined(typeof(ConformityOptions), conformity))
+				throw new ArgumentOutOfRangeException("conformity");
+
+			_conformity = conformity;
+		}
+
+		public enum ConformityOptions
+		{
+			/// <summary>
+			/// This will allow the sheets to have LESS mixins which may appear like class selectors - eg. ".RoundedCorners (@radius)" - they must have the optional
+			/// brackets after them - eg. ".RoundedCorners ()" is acceptable but ".RoundedCorners" is not - since without the brackets there is no way to differentiate
+			/// between a mixin in and a class selector
+			/// </summary>
+			AllowLessCssMixins,
+			Strict
+		}
+
 		public bool DoesThisRuleApplyTo(StyleSheetTypeOptions styleSheetType)
 		{
 			if (!Enum.IsDefined(typeof(StyleSheetTypeOptions), styleSheetType))
@@ -31,24 +51,20 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			foreach (var fragment in fragments)
 			{
 				var selectorFragment = fragment as Selector;
-				if ((selectorFragment != null) && (selectorFragment.Selectors.Any(s => !IsValidSelector(s))))
-					throw new OnlyAllowBareSelectorsEncounteredException(selectorFragment);
+				if (selectorFragment != null)
+				{
+					// Mixin should contain brackets (eg. ".RounderBorders (@radius)" or ".RounderBorders ()"), while they are valid without the brackets
+					// there is no way to distinguish them from class-based selectors so we can't support their detection here
+					var bareSelector = !selectorFragment.Selectors.Any(s => s.Value.Contains(".") || s.Value.Contains("#"));
+					var lessCssMixin = (selectorFragment.Selectors.Count() == 1) && selectorFragment.Selectors.First().Value.Contains("(");
+					if (!bareSelector && ((_conformity == ConformityOptions.Strict) || !lessCssMixin))
+						throw new OnlyAllowBareSelectorsEncounteredException(selectorFragment);
+				}
 
 				var containerFragment = fragment as ContainerFragment;
 				if (containerFragment != null)
 					EnsureRulesAreMet(containerFragment.ChildFragments);
 			}
-		}
-
-		/// <summary>
-		/// In order to be a valid selector in this context, there must be no base css selectors unless they are preceded with the child selector symbol
-		/// </summary>
-		private bool IsValidSelector(Selector.WhiteSpaceNormalisedString cssSelector)
-		{
-			if (cssSelector == null)
-				throw new ArgumentNullException("cssSelector");
-
-			return !cssSelector.Value.Contains('.') && !cssSelector.Value.Contains('#');
 		}
 
 		public class OnlyAllowBareSelectorsEncounteredException : BrokenRuleEncounteredException

@@ -78,9 +78,9 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			//   already been normalised (as it's a WhiteSpaceNormalisedString!)
 			foreach (var cssSelectorSegment in cssSelector.Value.Replace("> ", ">").Replace(">", " >").Replace("  ", " ").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
 			{
-				// If the segment has a child selector symbol or contains a class or an id then it's ok, if none of these conditions are met then the
-				// selector must be considered invalid (it is a bare selector)
-				if (!cssSelectorSegment.StartsWith(">") && !cssSelectorSegment.Contains(".") && !cssSelectorSegment.Contains("#"))
+				// If the segment has a child selector symbol (">"), parent selector symbol ("&") or contains a class or an id then it's ok, if none of
+				// these conditions are met then the selector must be considered invalid (it is a bare selector)
+				if (!cssSelectorSegment.StartsWith(">") && !cssSelectorSegment.StartsWith("&") && !cssSelectorSegment.Contains(".") && !cssSelectorSegment.Contains("#"))
 					return false;
 			}
 			return true;

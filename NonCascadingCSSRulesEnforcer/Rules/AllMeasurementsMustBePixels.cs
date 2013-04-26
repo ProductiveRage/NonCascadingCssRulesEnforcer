@@ -16,7 +16,10 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		private readonly ConformityOptions _conformity;
 		public AllMeasurementsMustBePixels(ConformityOptions conformity)
 		{
-			if (!Enum.IsDefined(typeof(ConformityOptions), conformity))
+			var allCombinedConformityOptionValues = 0;
+			foreach (int conformityOptionValue in Enum.GetValues(typeof(ConformityOptions)))
+				allCombinedConformityOptionValues = allCombinedConformityOptionValues | conformityOptionValue;
+			if ((allCombinedConformityOptionValues | (int)conformity) != allCombinedConformityOptionValues)
 				throw new ArgumentOutOfRangeException("conformity");
 
 			_conformity = conformity;
@@ -32,17 +35,23 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			return styleSheetType != StyleSheetTypeOptions.Compiled;
 		}
 
+		[Flags]
 		public enum ConformityOptions
 		{
 			/// <summary>
-			/// This will allow div elements to have a width with a percentage unit and img elements whose styles are nested within the div style block to have width:100%
-			/// </summary>
-			AllowPercentageWidthDivs,
-
-			/// <summary>
 			/// This will not allow any element to have any measurement unit that is not in pixels
 			/// </summary>
-			Strict
+			Strict = 0,
+
+			/// <summary>
+			/// This will allow div elements to have a width with a percentage unit and img elements whose styles are nested within the div style block to have width:100%
+			/// </summary>
+			AllowPercentageWidthDivs = 1,
+
+			/// <summary>
+			/// This will allow any property to be specified as 100% (acceptable for width or font-size, for example)
+			/// </summary>
+			AllowOneHundredPercentOnAnyElementAndProperty = 2
 		}
 
 		/// <summary>
@@ -82,9 +91,14 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 
 				// Generic tests for measurement units
 				var stylePropertyValueFragmentSections = stylePropertyValueFragment.GetValueSections();
+				if ((_conformity & ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty) == ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty)
+				{
+					if (stylePropertyValueFragment.Value == "100%")
+						continue;
+				}
 				foreach (var value in stylePropertyValueFragmentSections)
 				{
-					if (_conformity == ConformityOptions.AllowPercentageWidthDivs)
+					if ((_conformity & ConformityOptions.AllowPercentageWidthDivs) == ConformityOptions.AllowPercentageWidthDivs)
 					{
 						// If ConformityOptions.AllowPercentageWidthDivs was specified then allow div elements to have a percentage width and for img elements within those
 						// divs (the style must be declared nested within the div style as supported by LESS, it is not sufficient

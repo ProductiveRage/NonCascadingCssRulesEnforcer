@@ -34,6 +34,10 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				if (fragment == null)
 					throw new ArgumentException("Null reference encountered in fragments set");
 
+				// Ignore @import statements in non-compiled content
+				if (fragment is Import)
+					continue;
+
 				var selectorFragment = fragment as Selector;
 				if ((selectorFragment == null) || !selectorFragment.IsScopeRestrictingBodyTag())
 					throw new ScopeRestrictingBodyTagNotAppliedException(fragment);

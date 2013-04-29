@@ -48,11 +48,13 @@
     <Compile Include="ExtendedLESSParserExtensions\IEnumerableICSSFragment_Extensions.cs" />
     <Compile Include="ExtendedLESSParserExtensions\Selector_Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RuleEnforcingCssFileLoader.cs" />
     <Compile Include="Rules\BrokenRuleEncounteredException.cs" />
     <Compile Include="Rules\BodyScopingMustBeAppliedToNonResetsOrThemesSheets.cs" />
     <Compile Include="Rules\AllMeasurementsMustBePixels.cs" />
     <Compile Include="Rules\BorderWidthMustBeFullySpecifiedIfSpecifiedAtAll.cs" />
     <Compile Include="Rules\BorderAndPaddingMayNotBeCombinedWithWidth.cs" />
+    <Compile Include="Rules\NoSelectorMayBeRepeatedInTheRules.cs" />
     <Compile Include="Rules\PaddingMustBeFullySpecifiedIfSpecifiedAtAll.cs" />
     <Compile Include="Rules\PropertyMustBeFullySpecifiedIfSpecifiedAtAll.cs" />
     <Compile Include="Rules\MarginMustBeFullySpecifiedIfSpecifiedAtAll.cs" />

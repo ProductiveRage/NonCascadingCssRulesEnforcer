@@ -46,6 +46,7 @@
     <Compile Include="Rules\BodyScopingMustBeAppliedToNonResetsOrThemesSheetsTests.cs" />
     <Compile Include="Rules\AllMeasurementsMustBePixelsTests.cs" />
     <Compile Include="Rules\BorderAndPaddingMayNotBeCombinedWithWidthTests.cs" />
+    <Compile Include="Rules\NoSelectorMayBeRepeatedInTheRulesTests.cs" />
     <Compile Include="Rules\PaddingMustBeFullySpecifiedIfSpecifiedAtAllTests.cs" />
     <Compile Include="Rules\MarginMustBeFullySpecifiedIfSpecifiedAtAllTests.cs" />
     <Compile Include="Rules\NoBareSelectorsInNonResetsOrThemeSheetsTests.cs" />

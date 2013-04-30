@@ -1,8 +1,8 @@
 ﻿using System;
+using CSSParser.ExtendedLESSParser;
 using NonCascadingCSSRulesEnforcer.Rules;
 using UnitTests.Shared;
 using Xunit;
-using CSSParser.ExtendedLESSParser;
 
 namespace UnitTests.Rules
 {
@@ -11,18 +11,24 @@ namespace UnitTests.Rules
 		[Fact]
 		public void NullInputWillThrowAnException()
 		{
+			var ruleEnforcer = new NoSelectorMayBeRepeatedInTheRules(
+				NoSelectorMayBeRepeatedInTheRules.ConformityOptions.AllowBareSelectorsToBeRepeated
+			);
 			Assert.Throws<ArgumentNullException>(() =>
 			{
-				(new NoSelectorMayBeRepeatedInTheRules()).EnsureRulesAreMet(null);
+				ruleEnforcer.EnsureRulesAreMet(null);
 			});
 		}
 
 		[Fact]
 		public void EmptyContentIsFine()
 		{
+			var ruleEnforcer = new NoSelectorMayBeRepeatedInTheRules(
+				NoSelectorMayBeRepeatedInTheRules.ConformityOptions.AllowBareSelectorsToBeRepeated
+			);
 			Assert.DoesNotThrow(() =>
 			{
-				(new NoSelectorMayBeRepeatedInTheRules()).EnsureRulesAreMet(new ICSSFragment[0]);
+				ruleEnforcer.EnsureRulesAreMet(new ICSSFragment[0]);
 			});
 		}
 
@@ -37,9 +43,12 @@ namespace UnitTests.Rules
 				).ToContainerFragment()
 			};
 
+			var ruleEnforcer = new NoSelectorMayBeRepeatedInTheRules(
+				NoSelectorMayBeRepeatedInTheRules.ConformityOptions.AllowBareSelectorsToBeRepeated
+			);
 			Assert.DoesNotThrow(() =>
 			{
-				(new NoSelectorMayBeRepeatedInTheRules()).EnsureRulesAreMet(content);
+				ruleEnforcer.EnsureRulesAreMet(content);
 			});
 		}
 
@@ -58,9 +67,12 @@ namespace UnitTests.Rules
 				).ToContainerFragment()
 			};
 
+			var ruleEnforcer = new NoSelectorMayBeRepeatedInTheRules(
+				NoSelectorMayBeRepeatedInTheRules.ConformityOptions.AllowBareSelectorsToBeRepeated
+			);
 			Assert.Throws<NoSelectorMayBeRepeatedInTheRules.NoSelectorMayBeRepeatedInTheRulesException>(() =>
 			{
-				(new NoSelectorMayBeRepeatedInTheRules()).EnsureRulesAreMet(content);
+				ruleEnforcer.EnsureRulesAreMet(content);
 			});
 		}
 
@@ -79,9 +91,12 @@ namespace UnitTests.Rules
 				).ToContainerFragment()
 			};
 
+			var ruleEnforcer = new NoSelectorMayBeRepeatedInTheRules(
+				NoSelectorMayBeRepeatedInTheRules.ConformityOptions.AllowBareSelectorsToBeRepeated
+			);
 			Assert.DoesNotThrow(() =>
 			{
-				(new NoSelectorMayBeRepeatedInTheRules()).EnsureRulesAreMet(content);
+				ruleEnforcer.EnsureRulesAreMet(content);
 			});
 		}
 
@@ -103,9 +118,12 @@ namespace UnitTests.Rules
 				).ToContainerFragment()
 			};
 
+			var ruleEnforcer = new NoSelectorMayBeRepeatedInTheRules(
+				NoSelectorMayBeRepeatedInTheRules.ConformityOptions.AllowBareSelectorsToBeRepeated
+			);
 			Assert.DoesNotThrow(() =>
 			{
-				(new NoSelectorMayBeRepeatedInTheRules()).EnsureRulesAreMet(content);
+				ruleEnforcer.EnsureRulesAreMet(content);
 			});
 		}
 
@@ -134,9 +152,12 @@ namespace UnitTests.Rules
 				).ToContainerFragment()
 			};
 
+			var ruleEnforcer = new NoSelectorMayBeRepeatedInTheRules(
+				NoSelectorMayBeRepeatedInTheRules.ConformityOptions.AllowBareSelectorsToBeRepeated
+			);
 			Assert.DoesNotThrow(() =>
 			{
-				(new NoSelectorMayBeRepeatedInTheRules()).EnsureRulesAreMet(content);
+				ruleEnforcer.EnsureRulesAreMet(content);
 			});
 		}
 	}

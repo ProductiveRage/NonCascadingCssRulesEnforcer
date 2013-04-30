@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using CSSParser.ExtendedLESSParser;
+using NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions;
 
 namespace NonCascadingCSSRulesEnforcer.Rules
 {
@@ -55,9 +56,8 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				{
 					// Mixin should contain brackets (eg. ".RounderBorders (@radius)" or ".RounderBorders ()"), while they are valid without the brackets
 					// there is no way to distinguish them from class-based selectors so we can't support their detection here
-					var bareSelector = !selectorFragment.Selectors.Any(s => s.Value.Contains(".") || s.Value.Contains("#"));
 					var lessCssMixin = (selectorFragment.Selectors.Count() == 1) && selectorFragment.Selectors.First().Value.Contains("(");
-					if (!bareSelector && ((_conformity == ConformityOptions.Strict) || !lessCssMixin))
+					if (!selectorFragment.IsBareSelector() && ((_conformity == ConformityOptions.Strict) || !lessCssMixin))
 						throw new OnlyAllowBareSelectorsEncounteredException(selectorFragment);
 				}
 

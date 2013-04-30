@@ -32,7 +32,8 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			if (!Enum.IsDefined(typeof(StyleSheetTypeOptions), styleSheetType))
 				throw new ArgumentOutOfRangeException("styleSheetType");
 
-			return ((styleSheetType != StyleSheetTypeOptions.Compiled) && (styleSheetType != StyleSheetTypeOptions.Reset) && (styleSheetType != StyleSheetTypeOptions.Themes));
+			// This can only apply to "Other" stylesheets since anything else may be Resets or Themes or contain Resets or Themes content (ie. Combined stylesheet content)
+			return (styleSheetType == StyleSheetTypeOptions.Other);
 		}
 
 		/// <summary>

@@ -32,7 +32,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 
 			// This can't be applied to compiled stylesheets as the ConformityOptions.AllowPercentageWidthDivs option specifies that img elements are allowed width:100% if
 			// the style is nested within a div that has percentage width (when the rules are compiled this nesting will no longer be possible)
-			return styleSheetType != StyleSheetTypeOptions.Compiled;
+			return (styleSheetType != StyleSheetTypeOptions.Compiled);
 		}
 
 		[Flags]
@@ -78,10 +78,10 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				if (fragment == null)
 					throw new ArgumentException("Null reference encountered in fragments set");
 
-				var containerFragmentFragment = fragment as ContainerFragment;
-				if (containerFragmentFragment != null)
+				var containerFragment = fragment as ContainerFragment;
+				if (containerFragment != null)
 				{
-					EnsureRulesAreMet(containerFragmentFragment.ChildFragments, containers.Concat(new[] { containerFragmentFragment }));
+					EnsureRulesAreMet(containerFragment.ChildFragments, containers.Concat(new[] { containerFragment }));
 					continue;
 				}
 
@@ -193,7 +193,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			tagName = tagName.Trim();
 			foreach (var finalSelectorSegment in parentSelector.Selectors.Select(s => s.Value.Split(' ').Last()))
 			{
-				var targetedTagName = finalSelectorSegment.Split(new[] { '.', '#', ':' }).First();
+				var targetedTagName = finalSelectorSegment.Split(new[] { '.', '#', ':' }).First(); // TODO: Handle '[' and add unit test to illustrate
 				if (!targetedTagName.Equals(tagName, StringComparison.InvariantCultureIgnoreCase))
 					return false;
 			}

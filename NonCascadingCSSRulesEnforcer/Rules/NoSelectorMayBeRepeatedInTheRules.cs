@@ -3,20 +3,66 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using CSSParser.ExtendedLESSParser;
+using NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions;
 
 namespace NonCascadingCSSRulesEnforcer.Rules
 {
 	/// <summary>
-	/// TODO
+	/// No selectors should be repeated throughout the rules, each element should be fully defined in a single place. LESS mixins may be used to declare styles that
+	/// are applied to multiple elements if some of those elements require further specialisation. The rule can optionally be relaxed for bare selectors so that
+	/// selectors in Resets or Themes may be repeated (eg. "strong" may be reset in a standard Reset sheet and then overwritten with "font-weight:bold" in a
+	/// given Theme sheet).
 	/// </summary>
 	public class NoSelectorMayBeRepeatedInTheRules : IEnforceRules
 	{
+		private readonly ConformityOptions _conformity;
+		public NoSelectorMayBeRepeatedInTheRules(ConformityOptions conformity)
+		{
+			if (!Enum.IsDefined(typeof(ConformityOptions), conformity))
+				throw new ArgumentOutOfRangeException("conformity");
+
+			_conformity = conformity;
+		}
+
+		public enum ConformityOptions
+		{
+			/// <summary>
+			/// Bare selectors may optionally be allowed, this is to allow for Resets and Themes sheets to both have basic styles for some elements
+			/// </summary>
+			AllowBareSelectorsToBeRepeated,
+
+			/// <summary>
+			/// No selectors may be repeated if this option is enabled
+			/// </summary>
+			Strict
+		}
+
 		public bool DoesThisRuleApplyTo(StyleSheetTypeOptions styleSheetType)
 		{
 			if (!Enum.IsDefined(typeof(StyleSheetTypeOptions), styleSheetType))
 				throw new ArgumentOutOfRangeException("styleSheetType");
 
-			return (styleSheetType == StyleSheetTypeOptions.Compiled);
+			// Applying this to individual stylesheets would not give adequate cover (since selectors shouldn't be repeated anywhere throughout the styles, not
+			// just within a given sheet). It can't be applied to compiled content since it would prevent valid DRY through using of LESS mixins - eg.
+			//
+			//   .ListWithBlueItems
+			//   {
+			//     > li { color: blue; }
+			//   }
+			//   ul.List1
+			//   {
+			//     .ListWithBlueItems;
+			//     > li { padding: 4px; }
+			//   }
+			//
+			// will be compiled into
+			//
+			//   ul.List1 > li { color: blue; }
+			//   ul.List1 > li { padding: 4px; }
+			//
+			// resulting in repeated selectors even though effort has been made to avoid duplication in the source.
+			// So this rule can only be applied Combined stylesheet content.
+			return (styleSheetType == StyleSheetTypeOptions.Combined);
 		}
 
 		/// <summary>
@@ -28,54 +74,96 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			if (fragments == null)
 				throw new ArgumentNullException("fragments");
 
-			EnsureRulesAreMet(fragments, new ContainerFragment[0]);
+			// TODO: (Optionally?) allow mixins to be repeated(?)
+
+			var allSelectors = GetAllSelectors(fragments, new ContainerFragment.SelectorSet[0]);
+			if (_conformity == ConformityOptions.AllowBareSelectorsToBeRepeated)
+				allSelectors = allSelectors.Where(s => !s.Selector.OnlyTargetsBareSelectors());
+
+			var usedSelectorLookup = new Dictionary<string, ICSSFragment>();
+			foreach (var selector in allSelectors.Select(s => new { Source = s.Source, Value = string.Join(" ", s.Selector.Select(v => v.Value)) }))
+			{
+				if (usedSelectorLookup.ContainsKey(selector.Value))
+					throw new NoSelectorMayBeRepeatedInTheRulesException(usedSelectorLookup[selector.Value], selector.Value);
+				usedSelectorLookup.Add(selector.Value, selector.Source);
+			}
 		}
 
-		private void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments, IEnumerable<ContainerFragment> containers)
+		private IEnumerable<SelectorSetWithSourceFragment> GetAllSelectors(IEnumerable<ICSSFragment> fragments, IEnumerable<ContainerFragment.SelectorSet> parentSelectors)
 		{
 			if (fragments == null)
 				throw new ArgumentNullException("fragments");
-			if (containers == null)
-				throw new ArgumentNullException("containers");
+			if (parentSelectors == null)
+				throw new ArgumentNullException("parentSelectors");
 
-			var selectors = new List<string>();
+			var newSelectors = new List<SelectorSetWithSourceFragment>();
 			foreach (var fragment in fragments)
 			{
 				if (fragment == null)
 					throw new ArgumentException("Null reference encountered in fragments set");
 
-				var selectorFragment = fragment as Selector;
-				if (selectorFragment != null)
-				{
-					// Selectors may not be directly nested within other Selectors in compiled stylesheets, though they may appear within Media Queries. I
-					// don't believe that nested Media Queries are supported by browsers currently, but it's possible that that may change in the future
-					// so the only restriction that is being imposed here is against nested Selectors. This constraint makes this rule's work easier since
-					// it only needs to look at Selectors within the current block. If Media Queries are nested within Selectors in LESS content then this
-					// will result in the particular selector appearing multiple times in the compiled output - eg.
-					//   div#Header { color: red; @media print { color: blue; } }
-					// will be compiled to
-					//   div#Header { color: red; }
-					//   @media print { div#Header { color: red; color: blue; } }
-					// and so the "div#Header" selector will appear multiple times, but not within the same block, so this is acceptable.
-					var directParent = containers.LastOrDefault();
-					if ((directParent != null) && (directParent is Selector))
-						throw new ArgumentException("Invalid content specified - only Compiled stylesheets are applicable to this rule and Selectors may not be nested within Selectors in Compiled styles");
+				var containerFragment = fragment as ContainerFragment;
+				if (containerFragment == null)
+					continue;
 
-					foreach (var selector in selectorFragment.Selectors.Select(s => s.Value).Distinct())
+				var parentSelectorsForChildFragments = new List<ContainerFragment.SelectorSet>();
+				if (!parentSelectors.Any())
+				{
+					parentSelectorsForChildFragments = containerFragment.Selectors.Select(
+						s => new ContainerFragment.SelectorSet(new[] { s })
+					).ToList();
+				}
+				else
+				{
+					foreach (var parentSelector in parentSelectors)
 					{
-						if (selectors.Contains(selector))
-							throw new NoSelectorMayBeRepeatedInTheRulesException(fragment, selector);
-						selectors.Add(selector);
+						if (parentSelector == null)
+							throw new ArgumentException("Null reference encountered in parentSelectors set");
+						foreach (var containerFragmentSelector in containerFragment.Selectors)
+						{
+							parentSelectorsForChildFragments.Add(
+								new ContainerFragment.SelectorSet(parentSelector.Concat(new[] { containerFragmentSelector }))
+							);
+						}
 					}
 				}
 
-				var containerFragmentFragment = fragment as ContainerFragment;
-				if (containerFragmentFragment != null)
+				if (containerFragment.ChildFragments.Any(f => f is StylePropertyValue))
 				{
-					EnsureRulesAreMet(containerFragmentFragment.ChildFragments, containers.Concat(new[] { containerFragmentFragment }));
-					continue;
+					newSelectors.AddRange(
+						parentSelectorsForChildFragments.Select(s => new SelectorSetWithSourceFragment(s, containerFragment))
+					);
 				}
+
+				newSelectors.AddRange(
+					GetAllSelectors(containerFragment.ChildFragments, parentSelectorsForChildFragments)
+				);
 			}
+			return newSelectors;
+		}
+
+		private class SelectorSetWithSourceFragment
+		{
+			public SelectorSetWithSourceFragment(ContainerFragment.SelectorSet selector, ICSSFragment source)
+			{
+				if (selector == null)
+					throw new ArgumentNullException("selector");
+				if (source == null)
+					throw new ArgumentNullException("source");
+
+				Selector = selector;
+				Source = source;
+			}
+
+			/// <summary>
+			/// This will never be null
+			/// </summary>
+			public ContainerFragment.SelectorSet Selector { get; private set; }
+
+			/// <summary>
+			/// This will never be null
+			/// </summary>
+			public ICSSFragment Source { get; private set; }
 		}
 
 		public class NoSelectorMayBeRepeatedInTheRulesException : BrokenRuleEncounteredException

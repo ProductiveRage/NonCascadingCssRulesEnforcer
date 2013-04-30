@@ -53,5 +53,13 @@ namespace NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions
 			}
 			return true;
 		}
+
+		public static bool IsBareSelector(this Selector source)
+		{
+			if (source == null)
+				throw new ArgumentNullException("source");
+
+			return source.Selectors.OnlyTargetsBareSelectors();
+		}
 	}
 }

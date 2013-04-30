@@ -17,7 +17,9 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			if (!Enum.IsDefined(typeof(StyleSheetTypeOptions), styleSheetType))
 				throw new ArgumentOutOfRangeException("styleSheetType");
 
-			return ((styleSheetType != StyleSheetTypeOptions.Compiled) && (styleSheetType != StyleSheetTypeOptions.Reset) && (styleSheetType != StyleSheetTypeOptions.Themes));
+			// This doesn't apply to Resets or Themes since they don't need body scoping and can't apply to Compiled sheets since the body-scoping tags may have been removed
+			// and can't apply to Combined content since thes may include content from Resets of Themes
+			return (styleSheetType == StyleSheetTypeOptions.Other);
 		}
 
 		/// <summary>

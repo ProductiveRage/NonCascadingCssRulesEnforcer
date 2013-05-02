@@ -54,7 +54,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				var selectorFragment = fragment as Selector;
 				if (selectorFragment != null)
 				{
-					if (!selectorFragment.IsScopeRestrictingBodyTag() || (_scopeRestrictingBodyTagBehaviour == ScopeRestrictingBodyTagBehaviourOptions.Disallow))
+					if (!selectorFragment.IsScopeRestrictingHtmlTag() || (_scopeRestrictingBodyTagBehaviour == ScopeRestrictingBodyTagBehaviourOptions.Disallow))
 					{
 						if (selectorFragment.Selectors.Any(s => !IsValidSelector(s)))
 							throw new DisallowBareSelectorsEncounteredException(selectorFragment);

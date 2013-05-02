@@ -8,16 +8,16 @@ using NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions;
 namespace NonCascadingCSSRulesEnforcer.Rules
 {
 	/// <summary>
-	/// This rule only applies to stylesheets other than the Resets and Themes files. No content other comments and whitespace may appear outside of scope-restricting body tags
+	/// This rule only applies to stylesheets other than the Resets and Themes files. No content other comments and whitespace may appear outside of scope-restricting html tags
 	/// </summary>
-	public class BodyScopingMustBeAppliedToNonResetsOrThemesSheets : IEnforceRules
+	public class HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets : IEnforceRules
 	{
 		public bool DoesThisRuleApplyTo(StyleSheetTypeOptions styleSheetType)
 		{
 			if (!Enum.IsDefined(typeof(StyleSheetTypeOptions), styleSheetType))
 				throw new ArgumentOutOfRangeException("styleSheetType");
 
-			// This doesn't apply to Resets or Themes since they don't need body scoping and can't apply to Compiled sheets since the body-scoping tags may have been removed
+			// This doesn't apply to Resets or Themes since they don't need html scoping and can't apply to Compiled sheets since the html-scoping tags may have been removed
 			// and can't apply to Combined content since thes may include content from Resets of Themes
 			return (styleSheetType == StyleSheetTypeOptions.Other);
 		}
@@ -41,15 +41,15 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 					continue;
 
 				var selectorFragment = fragment as Selector;
-				if ((selectorFragment == null) || !selectorFragment.IsScopeRestrictingBodyTag())
-					throw new ScopeRestrictingBodyTagNotAppliedException(fragment);
+				if ((selectorFragment == null) || !selectorFragment.IsScopeRestrictingHtmlTag())
+					throw new ScopeRestrictingHtmlTagNotAppliedException(fragment);
 			}
 		}
 
-		public class ScopeRestrictingBodyTagNotAppliedException : BrokenRuleEncounteredException
+		public class ScopeRestrictingHtmlTagNotAppliedException : BrokenRuleEncounteredException
 		{
-			public ScopeRestrictingBodyTagNotAppliedException(ICSSFragment fragment) : base("Scope-restricting body tag not applied", fragment) { }
-			protected ScopeRestrictingBodyTagNotAppliedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+			public ScopeRestrictingHtmlTagNotAppliedException(ICSSFragment fragment) : base("Scope-restricting html tag not applied", fragment) { }
+			protected ScopeRestrictingHtmlTagNotAppliedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 		}
 	}
 }

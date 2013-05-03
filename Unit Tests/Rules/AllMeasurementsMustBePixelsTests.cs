@@ -136,5 +136,23 @@ namespace UnitTests.Rules
 				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content })
 			);
 		}
+
+		/// <summary>
+		/// Since auto is not a numeric value it is not checked to ensure that it has "pixel" units, since "0" doesn't have any units (and because it IS zero and
+		/// not any other value) it is also allowed
+		/// </summary>
+		[Fact]
+		public void MarginAutoIsAcceptable()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"div",
+				CSSFragmentBuilderStyleProperty.New("margin", "0 auto")
+			).ToContainerFragment();
+
+			Assert.DoesNotThrow(() =>
+			{
+				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content });
+			});
+		}
 	}
 }

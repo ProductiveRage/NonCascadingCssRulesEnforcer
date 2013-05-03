@@ -109,5 +109,23 @@ namespace UnitTests.Rules
 			});
 		}
 
+		/// <summary>
+		/// Setting a border-radius property should not be marked as invalid since it doesn't affect the dimensions of the element (and may
+		/// still affect the rendering even if there is zero border width)
+		/// </summary>
+		[Fact]
+		public void WidthWithBorderRadiusIsFine()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"div",
+				CSSFragmentBuilderStyleProperty.New("width", "320px"),
+				CSSFragmentBuilderStyleProperty.New("border-radius", "8px")
+			).ToContainerFragment();
+
+			Assert.DoesNotThrow(() =>
+			{
+				(new BorderAndPaddingMayNotBeCombinedWithWidth()).EnsureRulesAreMet(new[] { content });
+			});
+		}
 	}
 }

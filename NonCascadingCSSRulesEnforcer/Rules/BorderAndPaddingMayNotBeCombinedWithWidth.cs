@@ -53,7 +53,11 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 						.Cast<StylePropertyValue>()
 						.Where(v =>
 							v.Property.Value.Equals("padding", StringComparison.InvariantCultureIgnoreCase) ||
-							v.Property.Value.StartsWith("border", StringComparison.InvariantCultureIgnoreCase)
+							(
+								// 2013-05-03 DWR: Setting "border-radius" is fine since that doesn't affect the dimensions
+								v.Property.Value.StartsWith("border", StringComparison.InvariantCultureIgnoreCase) &&
+								!v.Property.Value.StartsWith("border-radius", StringComparison.InvariantCultureIgnoreCase)
+							)
 						)
 						.Where(v => v.GetValueSectionsThatAreMeasurements().Any(m => m.Value != 0))
 						.FirstOrDefault();

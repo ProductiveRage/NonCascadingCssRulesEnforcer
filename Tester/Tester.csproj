@@ -11,7 +11,8 @@
     <RootNamespace>Tester</RootNamespace>
     <AssemblyName>Tester</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -34,6 +35,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CSSMinifier">
+      <HintPath>..\..\CSSMinifier\CSSMinifier\bin\Release\CSSMinifier.dll</HintPath>
+    </Reference>
+    <Reference Include="CSSParser, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\External Dependencies\CSSParser\CSSParser.dll</HintPath>
+    </Reference>
+    <Reference Include="CSSParser.ExtendedLESSParser, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\External Dependencies\CSSParser\CSSParser.ExtendedLESSParser.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,6 +55,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CSSMinifierIntegration\CSSMinifierIntegration.csproj">
+      <Project>{F738857B-1D37-4A9E-BAA0-AAE00AF7F14A}</Project>
+      <Name>CSSMinifierIntegration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NonCascadingCSSRulesEnforcer\NonCascadingCSSRulesEnforcer.csproj">
       <Project>{652E0968-054F-40BA-87A8-6348F023080D}</Project>
       <Name>NonCascadingCSSRulesEnforcer</Name>
@@ -51,6 +67,9 @@
       <Project>{4F4145D4-A0DC-43E6-9165-3A3C49A9117F}</Project>
       <Name>Unit Tests</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -58,6 +58,9 @@ namespace NonCascadingCSSRulesEnforcer.CSSMinifierIntegration
 		/// </summary>
 		public delegate StyleSheetTypeOptions StyleSheetTypeDeterminer(string relativePath);
 
+		/// <summary>
+		/// This will throw a BrokenRuleEncounteredInFileException if any of the specified rules are broken
+		/// </summary>
 		public TextFileContents Load(string relativePath)
 		{
 			if (string.IsNullOrWhiteSpace(relativePath))
@@ -91,7 +94,16 @@ namespace NonCascadingCSSRulesEnforcer.CSSMinifierIntegration
 						foreach (var ruleForIndividualFiles in rulesForIndividualFiles)
 						{
 							if (ruleForIndividualFiles.DoesThisRuleApplyTo(styleSheetType))
-								ruleForIndividualFiles.EnsureRulesAreMet(individualContentFragments);
+							{
+								try
+								{
+									ruleForIndividualFiles.EnsureRulesAreMet(individualContentFragments);
+								}
+								catch (BrokenRuleEncounteredException e)
+								{
+									throw new BrokenRuleEncounteredInFileException(e, styleSheetType, content.RelativePath);
+								}
+							}
 						}
 					}
 
@@ -123,7 +135,16 @@ namespace NonCascadingCSSRulesEnforcer.CSSMinifierIntegration
 					Parser.ParseLESS(compiledContent.Content)
 				);
 				foreach (var ruleForCompiledContent in rulesForCompiledContent)
-					ruleForCompiledContent.EnsureRulesAreMet(compiledContentFragments);
+				{
+					try
+					{
+						ruleForCompiledContent.EnsureRulesAreMet(compiledContentFragments);
+					}
+					catch (BrokenRuleEncounteredException e)
+					{
+						throw new BrokenRuleEncounteredInFileException(e, StyleSheetTypeOptions.Compiled, relativePath);
+					}
+				}
 			}
 
 			// Similarly rules for Combined content are processed (the combined content is retrieved from the ContentRecordingTextFileLoader)
@@ -141,7 +162,16 @@ namespace NonCascadingCSSRulesEnforcer.CSSMinifierIntegration
 						Parser.ParseLESS(combinedContent)
 					);
 					foreach (var ruleForCombinedContent in rulesForCombinedContent)
-						ruleForCombinedContent.EnsureRulesAreMet(combinedContentFragments);
+					{
+						try
+						{
+							ruleForCombinedContent.EnsureRulesAreMet(combinedContentFragments);
+						}
+						catch (BrokenRuleEncounteredException e)
+						{
+							throw new BrokenRuleEncounteredInFileException(e, StyleSheetTypeOptions.Combined, relativePath);
+						}
+					}
 				}
 			}
 

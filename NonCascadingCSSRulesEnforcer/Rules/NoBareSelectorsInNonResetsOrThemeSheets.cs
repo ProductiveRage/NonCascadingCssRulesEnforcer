@@ -12,16 +12,16 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 	/// </summary>
 	public class NoBareSelectorsInNonResetsOrThemeSheets : IEnforceRules
 	{
-		private readonly ScopeRestrictingBodyTagBehaviourOptions _scopeRestrictingBodyTagBehaviour;
-		public NoBareSelectorsInNonResetsOrThemeSheets(ScopeRestrictingBodyTagBehaviourOptions scopeRestrictingBodyTagBehaviour)
+		private readonly ScopeRestrictingHtmlTagBehaviourOptions _scopeRestrictingHtmlTagBehaviour;
+		public NoBareSelectorsInNonResetsOrThemeSheets(ScopeRestrictingHtmlTagBehaviourOptions scopeRestrictingHtmlTagBehaviour)
 		{
-			if (!Enum.IsDefined(typeof(ScopeRestrictingBodyTagBehaviourOptions), scopeRestrictingBodyTagBehaviour))
-				throw new ArgumentOutOfRangeException("scopeRestrictingBodyTagBehaviour");
+			if (!Enum.IsDefined(typeof(ScopeRestrictingHtmlTagBehaviourOptions), scopeRestrictingHtmlTagBehaviour))
+				throw new ArgumentOutOfRangeException("scopeRestrictingHtmlTagBehaviour");
 
-			_scopeRestrictingBodyTagBehaviour = scopeRestrictingBodyTagBehaviour;
+			_scopeRestrictingHtmlTagBehaviour = scopeRestrictingHtmlTagBehaviour;
 		}
 
-		public enum ScopeRestrictingBodyTagBehaviourOptions
+		public enum ScopeRestrictingHtmlTagBehaviourOptions
 		{
 			Allow,
 			Disallow
@@ -54,7 +54,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				var selectorFragment = fragment as Selector;
 				if (selectorFragment != null)
 				{
-					if (!selectorFragment.IsScopeRestrictingBodyTag() || (_scopeRestrictingBodyTagBehaviour == ScopeRestrictingBodyTagBehaviourOptions.Disallow))
+					if (!selectorFragment.IsScopeRestrictingHtmlTag() || (_scopeRestrictingHtmlTagBehaviour == ScopeRestrictingHtmlTagBehaviourOptions.Disallow))
 					{
 						if (selectorFragment.Selectors.Any(s => !IsValidSelector(s)))
 							throw new DisallowBareSelectorsEncounteredException(selectorFragment);

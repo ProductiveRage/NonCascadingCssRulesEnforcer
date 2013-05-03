@@ -46,6 +46,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BrokenRuleEncounteredInFileException.cs" />
     <Compile Include="RuleEnforcingCssFileLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

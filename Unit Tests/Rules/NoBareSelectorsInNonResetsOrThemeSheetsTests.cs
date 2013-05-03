@@ -8,60 +8,60 @@ namespace UnitTests.Rules
 	public class NoBareSelectorsInNonResetsOrThemeSheetsTests
 	{
 		[Fact]
-		public void EmptyContentIsAcceptable_ScopeRestrictingBodyTagAllowed()
+		public void EmptyContentIsAcceptable_ScopeRestrictingHtmlTagAllowed()
 		{
 			var content = new ICSSFragment[0];
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new NoBareSelectorsInNonResetsOrThemeSheets(NoBareSelectorsInNonResetsOrThemeSheets.ScopeRestrictingBodyTagBehaviourOptions.Allow)).EnsureRulesAreMet(content);
+				(new NoBareSelectorsInNonResetsOrThemeSheets(NoBareSelectorsInNonResetsOrThemeSheets.ScopeRestrictingHtmlTagBehaviourOptions.Allow)).EnsureRulesAreMet(content);
 			});
 		}
 
 		[Fact]
-		public void EmptyContentIsAcceptable_ScopeRestrictingBodyTagDisallowed()
+		public void EmptyContentIsAcceptable_ScopeRestrictingHtmlTagDisallowed()
 		{
 			var content = new ICSSFragment[0];
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new NoBareSelectorsInNonResetsOrThemeSheets(NoBareSelectorsInNonResetsOrThemeSheets.ScopeRestrictingBodyTagBehaviourOptions.Disallow)).EnsureRulesAreMet(content);
+				(new NoBareSelectorsInNonResetsOrThemeSheets(NoBareSelectorsInNonResetsOrThemeSheets.ScopeRestrictingHtmlTagBehaviourOptions.Disallow)).EnsureRulesAreMet(content);
 			});
 		}
 
 		[Fact]
-		public void BodyTagWithNoNestedContentIsAcceptable_ScopeRestrictingBodyTagAllowed()
+		public void HtmlTagWithNoNestedContentIsAcceptable_ScopeRestrictingHtmlTagAllowed()
 		{
-			var content = CSSFragmentBuilderSelector.New("body").ToContainerFragment();
+			var content = CSSFragmentBuilderSelector.New("html").ToContainerFragment();
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new NoBareSelectorsInNonResetsOrThemeSheets(NoBareSelectorsInNonResetsOrThemeSheets.ScopeRestrictingBodyTagBehaviourOptions.Allow)).EnsureRulesAreMet(new[] { content });
+				(new NoBareSelectorsInNonResetsOrThemeSheets(NoBareSelectorsInNonResetsOrThemeSheets.ScopeRestrictingHtmlTagBehaviourOptions.Allow)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
 		[Fact]
-		public void BodyTagWithNoNestedContentIsNotAcceptable_ScopeRestrictingBodyTagDisallowed()
+		public void HtmlTagWithNoNestedContentIsNotAcceptable_ScopeRestrictingHtmlTagDisallowed()
 		{
-			var content = CSSFragmentBuilderSelector.New("body").ToContainerFragment();
+			var content = CSSFragmentBuilderSelector.New("html").ToContainerFragment();
 
 			Assert.Throws<NoBareSelectorsInNonResetsOrThemeSheets.DisallowBareSelectorsEncounteredException>(() =>
 			{
-				(new NoBareSelectorsInNonResetsOrThemeSheets(NoBareSelectorsInNonResetsOrThemeSheets.ScopeRestrictingBodyTagBehaviourOptions.Disallow)).EnsureRulesAreMet(new[] { content });
+				(new NoBareSelectorsInNonResetsOrThemeSheets(NoBareSelectorsInNonResetsOrThemeSheets.ScopeRestrictingHtmlTagBehaviourOptions.Disallow)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
 		[Fact]
-		public void BodyTagWithStylePropertoesIsNotAcceptable_ScopeRestrictingBodyTagAllowed()
+		public void HtmlTagWithStylePropertoesIsNotAcceptable_ScopeRestrictingHtmlTagAllowed()
 		{
 			var content = CSSFragmentBuilderSelector.New(
-				"body",
+				"html",
 				CSSFragmentBuilderStyleProperty.New("color", "black")
 			).ToContainerFragment();
 
 			Assert.Throws<NoBareSelectorsInNonResetsOrThemeSheets.DisallowBareSelectorsEncounteredException>(() =>
 			{
-				(new NoBareSelectorsInNonResetsOrThemeSheets(NoBareSelectorsInNonResetsOrThemeSheets.ScopeRestrictingBodyTagBehaviourOptions.Allow)).EnsureRulesAreMet(new[] { content });
+				(new NoBareSelectorsInNonResetsOrThemeSheets(NoBareSelectorsInNonResetsOrThemeSheets.ScopeRestrictingHtmlTagBehaviourOptions.Allow)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 	}

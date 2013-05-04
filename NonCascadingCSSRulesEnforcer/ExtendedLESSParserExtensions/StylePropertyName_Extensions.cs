@@ -6,7 +6,7 @@ namespace NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions
 	public static class StylePropertyName_Extensions
 	{
 		/// <summary>
-		/// TODO
+		/// This will perform a case-insensitive match against the property name
 		/// </summary>
 		public static bool HasName(this StylePropertyName source, string value)
 		{

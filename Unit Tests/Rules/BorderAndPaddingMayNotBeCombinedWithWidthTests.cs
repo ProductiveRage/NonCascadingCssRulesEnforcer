@@ -16,7 +16,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new BorderAndPaddingMayNotBeCombinedWithWidth()).EnsureRulesAreMet(new[] { content });
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.Strict)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -31,7 +31,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new BorderAndPaddingMayNotBeCombinedWithWidth()).EnsureRulesAreMet(new[] { content });
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.Strict)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -45,7 +45,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new BorderAndPaddingMayNotBeCombinedWithWidth()).EnsureRulesAreMet(new[] { content });
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.Strict)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -60,7 +60,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new BorderAndPaddingMayNotBeCombinedWithWidth()).EnsureRulesAreMet(new[] { content });
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.Strict)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -75,7 +75,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new BorderAndPaddingMayNotBeCombinedWithWidth()).EnsureRulesAreMet(new[] { content });
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.Strict)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -90,7 +90,7 @@ namespace UnitTests.Rules
 
 			Assert.Throws<BorderAndPaddingMayNotBeCombinedWithWidth.BorderAndPaddingMayNotBeCombinedWithWidthException>(() =>
 			{
-				(new BorderAndPaddingMayNotBeCombinedWithWidth()).EnsureRulesAreMet(new[] { content });
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.Strict)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -105,7 +105,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new BorderAndPaddingMayNotBeCombinedWithWidth()).EnsureRulesAreMet(new[] { content });
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.Strict)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -120,7 +120,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new BorderAndPaddingMayNotBeCombinedWithWidth()).EnsureRulesAreMet(new[] { content });
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.Strict)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -135,7 +135,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new BorderAndPaddingMayNotBeCombinedWithWidth()).EnsureRulesAreMet(new[] { content });
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.Strict)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -154,7 +154,41 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new BorderAndPaddingMayNotBeCombinedWithWidth()).EnsureRulesAreMet(new[] { content });
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.Strict)).EnsureRulesAreMet(new[] { content });
+			});
+		}
+
+		[Fact]
+		public void VertialPaddingWithWidthIsNotAllowedIfAllowVerticalBorderAndPaddingNotIsEnabled()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"div",
+				CSSFragmentBuilderStyleProperty.New("width", "100%"),
+				CSSFragmentBuilderStyleProperty.New("padding", "2px 0")
+			).ToContainerFragment();
+
+			Assert.Throws<BorderAndPaddingMayNotBeCombinedWithWidth.BorderAndPaddingMayNotBeCombinedWithWidthException>(() =>
+			{
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(
+					BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.Strict
+				)).EnsureRulesAreMet(new[] { content });
+			});
+		}
+
+		[Fact]
+		public void VertialPaddingWithWidthIsFineIfAllowVerticalBorderAndPaddingIsEnabled()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"div",
+				CSSFragmentBuilderStyleProperty.New("padding", "16px 0"),
+				CSSFragmentBuilderStyleProperty.New("width", "100%")
+			).ToContainerFragment();
+
+			Assert.DoesNotThrow(() =>
+			{
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(
+					BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.AllowVerticalBorderAndPadding
+				)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 	}

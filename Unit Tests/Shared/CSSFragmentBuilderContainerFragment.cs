@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using CSSParser;
 using CSSParser.ExtendedLESSParser;
 
 namespace UnitTests.Shared
@@ -89,7 +91,11 @@ namespace UnitTests.Shared
 				return new ICSSFragment[]
 				{
 					stylePropertyName,
-					new StylePropertyValue(stylePropertyName, styleProperty.Value, 0)
+					new StylePropertyValue(
+						stylePropertyName,
+						GetValueSections(styleProperty.Value),
+						0
+					)
 				};
 			}
 
@@ -107,6 +113,33 @@ namespace UnitTests.Shared
 			}
 
 			throw new ArgumentException("Unsupported type: " + source.GetType());
+		}
+
+		private static IEnumerable<string> GetValueSections(string value)
+		{
+			if (value == null)
+				throw new ArgumentNullException("value");
+
+			// The CSSParser has to deal with quoting of values so we can use it here - given a property value it should return a set of sections where the only
+			// CharacterCategorisation values are Whitespace and Value, any whitespace within a quoted value will be identified as Value, not Whitespace
+			var sections = new List<string>();
+			var buffer = new StringBuilder();
+			foreach (var section in Parser.ParseCSS(value))
+			{
+				if (section.CharacterCategorisation == CSSParser.ContentProcessors.CharacterCategorisationOptions.Whitespace)
+				{
+					if (buffer.Length > 0)
+					{
+						sections.Add(buffer.ToString());
+						buffer.Clear();
+					}
+				}
+				else
+					buffer.Append(section.Value);
+			}
+			if (buffer.Length > 0)
+				sections.Add(buffer.ToString());
+			return sections;
 		}
 	}
 }

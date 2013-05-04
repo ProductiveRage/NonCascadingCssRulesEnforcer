@@ -63,22 +63,22 @@
             the string will have been trimmed. This will always have some content and never be null or blank.
             </summary>
         </member>
-        <member name="P:CSSParser.ExtendedLESSParser.StyleProperty.Value">
-            <summary>
-            This will never be null or blank, its value will always be trimmed
-            </summary>
-        </member>
-        <member name="P:CSSParser.ExtendedLESSParser.StyleProperty.SourceLineIndex">
-            <summary>
-            This will always be zero or greater
-            </summary>
-        </member>
         <member name="T:CSSParser.ExtendedLESSParser.LessCssHierarchicalParser">
             <summary>
             This will take the data returned from the CSSParser.Parser methods and process it further into a hierarchical set of ICSSFragment instances
             where each fragment is a selector (which may represent a css selector - eg. "div.Header" - or media query) or style property names and
             values within the selectors. Selectors may be nested in the case of selectors within media queries or selectors nested within other
             selectors (as enabled by LESS CSS).
+            </summary>
+        </member>
+        <member name="P:CSSParser.ExtendedLESSParser.StylePropertyName.Value">
+            <summary>
+            This will never be null or blank, its value will always be trimmed
+            </summary>
+        </member>
+        <member name="P:CSSParser.ExtendedLESSParser.StylePropertyName.SourceLineIndex">
+            <summary>
+            This will always be zero or greater
             </summary>
         </member>
         <member name="T:CSSParser.ExtendedLESSParser.Import">
@@ -106,6 +106,16 @@
         <member name="P:CSSParser.ExtendedLESSParser.StylePropertyValue.Property">
             <summary>
             This will never be null
+            </summary>
+        </member>
+        <member name="P:CSSParser.ExtendedLESSParser.StylePropertyValue.ValueSegments">
+            <summary>
+            This will never be null empty or contain any null or blank values, all of the strings will have been trimmed
+            </summary>
+        </member>
+        <member name="P:CSSParser.ExtendedLESSParser.StylePropertyValue.SourceLineIndex">
+            <summary>
+            This will always be zero or greater
             </summary>
         </member>
     </members>

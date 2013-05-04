@@ -90,10 +90,10 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 					continue;
 
 				// Generic tests for measurement units
-				var stylePropertyValueFragmentSections = stylePropertyValueFragment.GetValueSections();
+				var stylePropertyValueFragmentSections = stylePropertyValueFragment.ValueSegments;
 				if ((_conformity & ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty) == ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty)
 				{
-					if (stylePropertyValueFragment.Value == "100%")
+					if (stylePropertyValueFragment.HasValue("100%"))
 						continue;
 				}
 				foreach (var value in stylePropertyValueFragmentSections)
@@ -140,7 +140,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 										.SelectMany(s => s.ChildFragments)
 										.Where(f => f is StylePropertyValue)
 										.Cast<StylePropertyValue>()
-										.Where(s => s.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase) && s.Value.EndsWith("%"))
+										.Where(s => s.Property.HasName("width") && s.GetValueSectionsThatAreMeasurements().All(v => v.Unit =="%"))
 										.FirstOrDefault();
 									if (firstContainerWithPercentageWidth != null)
 										continue;

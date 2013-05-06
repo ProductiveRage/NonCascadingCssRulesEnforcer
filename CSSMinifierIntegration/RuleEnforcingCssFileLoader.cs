@@ -112,7 +112,11 @@ namespace NonCascadingCSSRulesEnforcer.CSSMinifierIntegration
 					// no significant negative impact)
 					lock (loadedContentBuilder)
 					{
-						loadedContentBuilder.Append(content.Content);
+						// Using AppendLine rather than Append means that if any files have a single-line comment (eg. "// Comment") on
+						// their last line then the content will be correctly interpreted as a comment when the combined content is
+						// parsed (otherwise the first line of the next file will end up on the same line as the comment and some
+						// of it may be incorrectly identified as comment content)
+						loadedContentBuilder.AppendLine(content.Content);
 					}
 				}
 			);

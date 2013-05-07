@@ -51,10 +51,13 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 					continue;
 				
 				// Try to determine whether a width has been explicitly set
-				// - If there are multiple then the last one will be applied by the browser, so consider that
+				// - If there are multiple then the last one will be applied by the browser, so consider that (if any have "!important" specified then they
+				//   may override, so the styles are ordered so that those without "!important" appear first and then those that do, it is the last entry
+				//   of this set that we want)
 				var propertyValues = containerFragment.ChildFragments
 					.Where(f => (f is StylePropertyValue))
-					.Cast<StylePropertyValue>();
+					.Cast<StylePropertyValue>()
+					.OrderBy(s => s.ValueSegments.Any(v => v.Equals("!important", StringComparison.InvariantCultureIgnoreCase)) ? 1 : 0);
 				var lastWidthPropertyIfAny = propertyValues.LastOrDefault(p => p.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase));
 				var isWidthDefined = (
 					(lastWidthPropertyIfAny != null) &&

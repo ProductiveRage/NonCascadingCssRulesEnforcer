@@ -36,6 +36,38 @@ namespace UnitTests.Rules
 		}
 
 		[Fact]
+		public void PaddingWithWidthAutoSpecifiedLastIsFine()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"div",
+				CSSFragmentBuilderStyleProperty.New("padding", "16px"),
+				CSSFragmentBuilderStyleProperty.New("width", "200px"),
+				CSSFragmentBuilderStyleProperty.New("width", "auto")
+			).ToContainerFragment();
+
+			Assert.DoesNotThrow(() =>
+			{
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.Strict)).EnsureRulesAreMet(new[] { content });
+			});
+		}
+
+		[Fact]
+		public void PaddingWithWidthAutoSpecifiedAsImportantIsFine()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"div",
+				CSSFragmentBuilderStyleProperty.New("padding", "16px"),
+				CSSFragmentBuilderStyleProperty.New("width", "auto !important"),
+				CSSFragmentBuilderStyleProperty.New("width", "200px")
+			).ToContainerFragment();
+
+			Assert.DoesNotThrow(() =>
+			{
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.Strict)).EnsureRulesAreMet(new[] { content });
+			});
+		}
+
+		[Fact]
 		public void WidthOnlyIsFine()
 		{
 			var content = CSSFragmentBuilderSelector.New(

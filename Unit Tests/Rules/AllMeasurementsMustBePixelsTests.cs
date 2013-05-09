@@ -16,7 +16,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content });
+				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -34,7 +34,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content });
+				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -55,7 +55,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content });
+				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -77,7 +77,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content });
+				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -90,7 +90,7 @@ namespace UnitTests.Rules
 			).ToContainerFragment();
 
 			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(
-				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content })
+				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content })
 			);
 		}
 
@@ -107,7 +107,7 @@ namespace UnitTests.Rules
 			).ToContainerFragment();
 
 			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(
-				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content })
+				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content })
 			);
 		}
 
@@ -120,7 +120,7 @@ namespace UnitTests.Rules
 			).ToContainerFragment();
 
 			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(
-				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content })
+				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content })
 			);
 		}
 
@@ -133,7 +133,7 @@ namespace UnitTests.Rules
 			).ToContainerFragment();
 
 			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(
-				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content })
+				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content })
 			);
 		}
 
@@ -151,7 +151,7 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs)).EnsureRulesAreMet(new[] { content });
+				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 	}

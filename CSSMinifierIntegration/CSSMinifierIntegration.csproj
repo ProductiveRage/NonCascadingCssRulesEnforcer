@@ -32,15 +32,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CSSMinifier">
-      <HintPath>..\External Dependencies\CSSMinifier\CSSMinifier.dll</HintPath>
+      <HintPath>..\External Dependencies\CSSMinifierAndParser\CSSMinifier.dll</HintPath>
     </Reference>
-    <Reference Include="CSSParser, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\External Dependencies\CSSParser\CSSParser.dll</HintPath>
+    <Reference Include="CSSParser">
+      <HintPath>..\External Dependencies\CSSMinifierAndParser\CSSParser.dll</HintPath>
     </Reference>
-    <Reference Include="CSSParser.ExtendedLESSParser, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\External Dependencies\CSSParser\CSSParser.ExtendedLESSParser.dll</HintPath>
+    <Reference Include="CSSParser.ExtendedLESSParser">
+      <HintPath>..\External Dependencies\CSSMinifierAndParser\CSSParser.ExtendedLESSParser.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />

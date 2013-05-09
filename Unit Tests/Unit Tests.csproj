@@ -32,10 +32,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CSSParser">
-      <HintPath>..\External Dependencies\CSSParser\CSSParser.dll</HintPath>
+      <HintPath>..\External Dependencies\CSSMinifierAndParser\CSSParser.dll</HintPath>
     </Reference>
     <Reference Include="CSSParser.ExtendedLESSParser">
-      <HintPath>..\External Dependencies\CSSParser\CSSParser.ExtendedLESSParser.dll</HintPath>
+      <HintPath>..\External Dependencies\CSSMinifierAndParser\CSSParser.ExtendedLESSParser.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

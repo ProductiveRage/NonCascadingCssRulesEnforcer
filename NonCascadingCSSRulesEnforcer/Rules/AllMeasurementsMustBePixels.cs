@@ -44,9 +44,9 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			Strict = 0,
 
 			/// <summary>
-			/// This will allow div elements to have a width with a percentage unit and img elements whose styles are nested within the div style block to have width:100%
+			/// This will allow div and td elements to have a width with a percentage unit and img elements whose styles are nested within their style blocks to have width:100%
 			/// </summary>
-			AllowPercentageWidthDivs = 1,
+			AllowPercentageWidthDivsAndTDs = 1,
 
 			/// <summary>
 			/// This will allow any property to be specified as 100% (acceptable for width or font-size, for example)
@@ -98,15 +98,18 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				}
 				foreach (var value in stylePropertyValueFragmentSections)
 				{
-					if ((_conformity & ConformityOptions.AllowPercentageWidthDivs) == ConformityOptions.AllowPercentageWidthDivs)
+					if ((_conformity & ConformityOptions.AllowPercentageWidthDivsAndTDs) == ConformityOptions.AllowPercentageWidthDivsAndTDs)
 					{
-						// If ConformityOptions.AllowPercentageWidthDivs was specified then allow div elements to have a percentage width and for img elements within those
-						// divs (the style must be declared nested within the div style as supported by LESS, it is not sufficient
+						// If ConformityOptions.AllowPercentageWidthDivsAndTDs was specified then allow div and td elements to have a percentage width and for img elements
+						// within those elements to have a width applied of 100% (the style must be declared nested within the div or td style as supported by LESS, it is
+						// not sufficient for the style for the img to appear elsewhere as the rule will not be able to confirm that it is a descendent of a 100% div / td)
 						// - See http://www.productiverage.com/Read/46 for justification for allowing the relaxation of this rule
 						// - The HTML5 "section" element should have semantic meaning, "div" is still appropriate as a container if no semantic meaning is attached, as such
 						//   it is acceptable that only div wrappers may have "width:100%" (see http://webdesign.about.com/od/html5tags/a/when-to-use-section-element.htm
 						//   and http://html5doctor.com/you-can-still-use-div)
-						
+						// - When using tables, it is acceptable to specify a width since the normal rules about layout can be considered differently for tables, it's
+						//   valid to arrange the columns and fit the data around that rather than trying to fit layout around content
+
 						// To get the parent Selector we have to walk backwards up the containers set since this property value could be wrapped in a MediaQuery - eg.
 						// div.Whatever {
 						//   @media screen and (max-width:70em) {
@@ -118,12 +121,13 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 						&& stylePropertyValueFragment.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase)
 						&& value.EndsWith("%", StringComparison.InvariantCultureIgnoreCase))
 						{
-							// If the selector for this property targets divs only (eg. "div.Main" or "div.Header div.Logo, div.Footer div.Logo") then allow percentage widths
-							if (DoesSelectorTargetOnlyElementsWithTagName(directParentSelector, "div"))
+							// If the selector for this property targets divs or tds only (eg. "div.Main" or "div.Header div.Logo, div.Footer div.Logo") then allow
+							// percentage widths
+							if (DoesSelectorTargetOnlyElementsWithTagNames(directParentSelector, new[] { "div", "td" }))
 								continue;
 
-							// If the selector for this property targets imgs only then allow "width:100%" values so long as they are inside a div with a percentage width
-							if (DoesSelectorTargetOnlyElementsWithTagName(directParentSelector, "img"))
+							// If the selector for this property targets imgs only then allow "width:100%" values so long as they are inside a div or td with a percentage width
+							if (DoesSelectorTargetOnlyElementsWithTagNames(directParentSelector, new[] { "img" }))
 							{
 								if (value.EndsWith("%"))
 								{
@@ -131,7 +135,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 										throw new AllMeasurementsMustBePixelsNotAppliedException("The only allow percentage width for img is 100%", fragment);
 
 									// We only need to ensure that the img is nested within an element with a percentage width, we don't have to worry about ensuring that
-									// the selector targets div elements only since this is handled by the above check (that percentage-width styles only target divs)
+									// the selector targets div/tds elements only since this is handled by the above check (that percentage-width styles only target divs)
 									// - Technically this would allow "div.Content { width: 50%; img { width: 100%; img { width: 100%; } } }" but that's not an error case
 									//   since the img tags are still 100% and inside a div with percentage width (it's probably not valid for img tags to be nested but
 									//   that's not a concern for this class)
@@ -146,7 +150,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 										continue;
 
 									throw new AllMeasurementsMustBePixelsNotAppliedException(
-										"Percentage width for img may is only allowable if nested within a div style with percentage width (and the img must have width:100%)",
+										"Percentage width for img may is only allowable if nested within a div or td style with percentage width (and the img must have width:100%)",
 										fragment
 									);
 								}
@@ -183,18 +187,21 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 
 		private static readonly string[] DisallowedMeasurementUnits = Constants.MeasurementUnits.Except(new[] { "px" }).ToArray();
 
-		private bool DoesSelectorTargetOnlyElementsWithTagName(Selector parentSelector, string tagName)
+		private bool DoesSelectorTargetOnlyElementsWithTagNames(Selector parentSelector, IEnumerable<string> tagNames)
 		{
 			if (parentSelector == null)
 				throw new ArgumentNullException("parentSelector");
-			if (string.IsNullOrWhiteSpace(tagName))
-				throw new ArgumentException("Null/blank tagName specified");
+			if (tagNames == null)
+				throw new ArgumentNullException("tagNames");
 
-			tagName = tagName.Trim();
+			var tagNamesTidied = tagNames.Select(t => (t ?? "").Trim()).ToArray();
+			if (tagNamesTidied.Any(t => t == ""))
+				throw new ArgumentException("Null/blank entry encountered in tagNames set");
+
 			foreach (var finalSelectorSegment in parentSelector.Selectors.Select(s => s.Value.Split(' ').Last()))
 			{
 				var targetedTagName = finalSelectorSegment.Split(new[] { '.', '#', ':' }).First(); // TODO: Handle '[' and add unit test to illustrate
-				if (!targetedTagName.Equals(tagName, StringComparison.InvariantCultureIgnoreCase))
+				if (!tagNamesTidied.Any(t => t.Equals(targetedTagName, StringComparison.InvariantCultureIgnoreCase)))
 					return false;
 			}
 			return true;

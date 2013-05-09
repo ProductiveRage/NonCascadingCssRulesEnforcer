@@ -16,7 +16,10 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content });
+				(new AllMeasurementsMustBePixels(
+					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
+					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+				)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -34,7 +37,10 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content });
+				(new AllMeasurementsMustBePixels(
+					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
+					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+				)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -55,7 +61,10 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content });
+				(new AllMeasurementsMustBePixels(
+					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
+					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+				)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -77,7 +86,10 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content });
+				(new AllMeasurementsMustBePixels(
+					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
+					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+				)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 
@@ -89,9 +101,13 @@ namespace UnitTests.Rules
 				CSSFragmentBuilderStyleProperty.New("width", "100%")
 			).ToContainerFragment();
 
-			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(
-				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content })
-			);
+			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(() =>
+			{
+				(new AllMeasurementsMustBePixels(
+					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
+					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+				)).EnsureRulesAreMet(new[] { content });
+			});
 		}
 
 		[Fact]
@@ -106,9 +122,13 @@ namespace UnitTests.Rules
 				)
 			).ToContainerFragment();
 
-			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(
-				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content })
-			);
+			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(() =>
+			{
+				(new AllMeasurementsMustBePixels(
+					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
+					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+				)).EnsureRulesAreMet(new[] { content });
+			});
 		}
 
 		[Fact]
@@ -119,9 +139,13 @@ namespace UnitTests.Rules
 				CSSFragmentBuilderStyleProperty.New("border", "0.5em solid black")
 			).ToContainerFragment();
 
-			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(
-				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content })
-			);
+			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(() =>
+			{
+				(new AllMeasurementsMustBePixels(
+					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
+					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+				)).EnsureRulesAreMet(new[] { content });
+			});
 		}
 
 		[Fact]
@@ -132,9 +156,13 @@ namespace UnitTests.Rules
 				CSSFragmentBuilderStyleProperty.New("border", "thick solid black")
 			).ToContainerFragment();
 
-			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(
-				() => (new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content })
-			);
+			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(() =>
+			{
+				(new AllMeasurementsMustBePixels(
+					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
+					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+				)).EnsureRulesAreMet(new[] { content });
+			});
 		}
 
 		/// <summary>
@@ -151,7 +179,10 @@ namespace UnitTests.Rules
 
 			Assert.DoesNotThrow(() =>
 			{
-				(new AllMeasurementsMustBePixels(AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivsAndTDs)).EnsureRulesAreMet(new[] { content });
+				(new AllMeasurementsMustBePixels(
+					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
+					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+				)).EnsureRulesAreMet(new[] { content });
 			});
 		}
 	}

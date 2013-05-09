@@ -9,12 +9,18 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 {
 	/// <summary>
 	/// This rule applies to all stylesheets. Measurements all be specified in pixels (no use of em, rem, mm, etc..). Note that these units ARE allowed in media queries but not
-	/// in styles for elements.
+	/// in styles for elements. This rule can be relaxed to allow certain elements that have percentage widths specified and for any images whose styles are nested within styles
+	/// for those elements to have width 100%.
+	/// If it is relaxed then it is recommended that only div, th and td elements are allowed percentage width. The first because a div element may be a container element used
+	/// for layout (in HTML5 divs are still appropriate as containers if no semantic meaning is attached -see http://webdesign.about.com/od/html5tags/a/when-to-use-section-element.htm)
+	/// while table cell elements do not abide by the same rules for layout that other elements do, it's valid to arrange the columns and fit the data around that rather than trying
+	/// to fit layout around content. Also see http://www.productiverage.com/Read/46 for more justification of the relaxation of this rule.
 	/// </summary>
 	public class AllMeasurementsMustBePixels : IEnforceRules
 	{
 		private readonly ConformityOptions _conformity;
-		public AllMeasurementsMustBePixels(ConformityOptions conformity)
+		private readonly IEnumerable<string> _percentageWidthElementTypesIfEnabled;
+		public AllMeasurementsMustBePixels(ConformityOptions conformity, IEnumerable<string> percentageWidthElementTypesIfEnabled)
 		{
 			var allCombinedConformityOptionValues = 0;
 			foreach (int conformityOptionValue in Enum.GetValues(typeof(ConformityOptions)))
@@ -22,16 +28,37 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			if ((allCombinedConformityOptionValues | (int)conformity) != allCombinedConformityOptionValues)
 				throw new ArgumentOutOfRangeException("conformity");
 
+			_percentageWidthElementTypesIfEnabled = (percentageWidthElementTypesIfEnabled ?? new string[0])
+				.Select(tagName => tagName.Trim().ToUpper())
+				.Distinct()
+				.ToArray();
+			if (_percentageWidthElementTypesIfEnabled.Any(tagName => tagName == ""))
+				throw new ArgumentException("Null/blank entry encountered in percentageWidthElementTypesIfEnabled set");
+
+			if ((conformity & ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes) == ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes)
+			{
+				if (!_percentageWidthElementTypesIfEnabled.Any())
+					throw new ArgumentException("percentageWidthElementTypesIfEnabled must have at least one value if AllowPercentageWidthsOnSpecifiedElementTypes is enabled");
+			}
+			else if (_percentageWidthElementTypesIfEnabled.Any())
+				throw new ArgumentException("percentageWidthElementTypesIfEnabled may not have any values specified if AllowPercentageWidthsOnSpecifiedElementTypes is not enabled");
+
 			_conformity = conformity;
 		}
+		public AllMeasurementsMustBePixels(ConformityOptions conformity) : this(conformity, new string[0]) { }
+
+		/// <summary>
+		/// If the ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes behaviour is enabled then these are the recommended exceptions: div, td and th
+		/// </summary>
+		public static IEnumerable<string> RecommendedPercentageWidthExceptions { get { return new[] { "div", "td", "th" }; } }
 
 		public bool DoesThisRuleApplyTo(StyleSheetTypeOptions styleSheetType)
 		{
 			if (!Enum.IsDefined(typeof(StyleSheetTypeOptions), styleSheetType))
 				throw new ArgumentOutOfRangeException("styleSheetType");
 
-			// This can't be applied to compiled stylesheets as the ConformityOptions.AllowPercentageWidthDivs option specifies that img elements are allowed width:100% if
-			// the style is nested within a div that has percentage width (when the rules are compiled this nesting will no longer be possible)
+			// This can't be applied to compiled stylesheets as the ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypesntageWidthDivs option specifies that img elements
+			// are allowed width:100% if the style is nested within a div that has percentage width (when the rules are compiled this nesting will no longer be possible)
 			return (styleSheetType != StyleSheetTypeOptions.Compiled);
 		}
 
@@ -44,9 +71,10 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			Strict = 0,
 
 			/// <summary>
-			/// This will allow div and td elements to have a width with a percentage unit and img elements whose styles are nested within their style blocks to have width:100%
+			/// This will specified element types to have a width with a percentage unit and img elements whose styles are nested within their style blocks to have width:100%,
+			/// the recommended element types for this option are div, td and th - this set is exposed through the static RecommendedPercentageWidthExceptions property
 			/// </summary>
-			AllowPercentageWidthDivsAndTDs = 1,
+			AllowPercentageWidthsOnSpecifiedElementTypes = 1,
 
 			/// <summary>
 			/// This will allow any property to be specified as 100% (acceptable for width or font-size, for example)
@@ -98,18 +126,8 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				}
 				foreach (var value in stylePropertyValueFragmentSections)
 				{
-					if ((_conformity & ConformityOptions.AllowPercentageWidthDivsAndTDs) == ConformityOptions.AllowPercentageWidthDivsAndTDs)
+					if ((_conformity & ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes) == ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes)
 					{
-						// If ConformityOptions.AllowPercentageWidthDivsAndTDs was specified then allow div and td elements to have a percentage width and for img elements
-						// within those elements to have a width applied of 100% (the style must be declared nested within the div or td style as supported by LESS, it is
-						// not sufficient for the style for the img to appear elsewhere as the rule will not be able to confirm that it is a descendent of a 100% div / td)
-						// - See http://www.productiverage.com/Read/46 for justification for allowing the relaxation of this rule
-						// - The HTML5 "section" element should have semantic meaning, "div" is still appropriate as a container if no semantic meaning is attached, as such
-						//   it is acceptable that only div wrappers may have "width:100%" (see http://webdesign.about.com/od/html5tags/a/when-to-use-section-element.htm
-						//   and http://html5doctor.com/you-can-still-use-div)
-						// - When using tables, it is acceptable to specify a width since the normal rules about layout can be considered differently for tables, it's
-						//   valid to arrange the columns and fit the data around that rather than trying to fit layout around content
-
 						// To get the parent Selector we have to walk backwards up the containers set since this property value could be wrapped in a MediaQuery - eg.
 						// div.Whatever {
 						//   @media screen and (max-width:70em) {
@@ -123,7 +141,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 						{
 							// If the selector for this property targets divs or tds only (eg. "div.Main" or "div.Header div.Logo, div.Footer div.Logo") then allow
 							// percentage widths
-							if (DoesSelectorTargetOnlyElementsWithTagNames(directParentSelector, new[] { "div", "td" }))
+							if (DoesSelectorTargetOnlyElementsWithTagNames(directParentSelector, _percentageWidthElementTypesIfEnabled))
 								continue;
 
 							// If the selector for this property targets imgs only then allow "width:100%" values so long as they are inside a div or td with a percentage width

@@ -50,11 +50,14 @@ namespace Tester
 				new IEnforceRules[]
 				{
 					new AllMeasurementsMustBePixels(
-						AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthDivs |
-						AllMeasurementsMustBePixels.ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty
+						AllMeasurementsMustBePixels.ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty |
+						AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
+						AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
 					),
 					new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets(),
-					new BorderAndPaddingMayNotBeCombinedWithWidth(),
+					new BorderAndPaddingMayNotBeCombinedWithWidth(
+						BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.AllowVerticalBorderAndPadding
+					),
 					new MarginMustBeFullySpecifiedIfSpecifiedAtAll(),
 					new NoBareSelectorsInNonResetsOrThemeSheets(
 						NoBareSelectorsInNonResetsOrThemeSheets.ScopeRestrictingHtmlTagBehaviourOptions.Allow

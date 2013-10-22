@@ -1,5 +1,5 @@
 ﻿using System.Runtime.Serialization;
-using CSSParser.ExtendedLESSParser;
+using CSSParser.ExtendedLESSParser.ContentSections;
 
 namespace NonCascadingCSSRulesEnforcer.Rules
 {

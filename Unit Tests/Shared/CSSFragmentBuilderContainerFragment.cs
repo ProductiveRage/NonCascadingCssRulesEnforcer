@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CSSParser;
-using CSSParser.ExtendedLESSParser;
+using CSSParser.ExtendedLESSParser.ContentSections;
 
 namespace UnitTests.Shared
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CSSParser.ExtendedLESSParser;
+using CSSParser.ExtendedLESSParser.ContentSections;
 
 namespace NonCascadingCSSRulesEnforcer.Rules
 {

@@ -36,7 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CSSMinifier">
-      <HintPath>..\..\CSSMinifier\CSSMinifier\bin\Release\CSSMinifier.dll</HintPath>
+      <HintPath>..\External Dependencies\CSSMinifierAndParser\CSSMinifier.dll</HintPath>
     </Reference>
     <Reference Include="CSSParser">
       <HintPath>..\External Dependencies\CSSMinifierAndParser\CSSParser.dll</HintPath>

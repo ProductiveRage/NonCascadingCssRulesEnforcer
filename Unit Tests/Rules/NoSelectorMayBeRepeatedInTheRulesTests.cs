@@ -3,6 +3,7 @@ using CSSParser.ExtendedLESSParser;
 using NonCascadingCSSRulesEnforcer.Rules;
 using UnitTests.Shared;
 using Xunit;
+using CSSParser.ExtendedLESSParser.ContentSections;
 
 namespace UnitTests.Rules
 {

@@ -1,4 +1,4 @@
-﻿using CSSParser.ExtendedLESSParser;
+﻿using CSSParser.ExtendedLESSParser.ContentSections;
 using NonCascadingCSSRulesEnforcer.Rules;
 using UnitTests.Shared;
 using Xunit;

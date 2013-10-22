@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using CSSParser.ExtendedLESSParser;
+using CSSParser.ExtendedLESSParser.ContentSections;
 
 namespace NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions
 {

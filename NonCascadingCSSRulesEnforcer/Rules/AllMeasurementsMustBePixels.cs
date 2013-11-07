@@ -135,9 +135,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 						//   }
 						// }
 						var directParentSelector = containers.LastOrDefault(c => c is Selector) as Selector;
-						if ((directParentSelector != null)
-						&& stylePropertyValueFragment.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase)
-						&& value.EndsWith("%", StringComparison.InvariantCultureIgnoreCase))
+						if ((directParentSelector != null) && stylePropertyValueFragment.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase) && IsPercentageMeasurement(value))
 						{
 							// If the selector for this property targets divs or tds only (eg. "div.Main" or "div.Header div.Logo, div.Footer div.Logo") then allow
 							// percentage widths
@@ -147,7 +145,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 							// If the selector for this property targets imgs only then allow "width:100%" values so long as they are inside a div or td with a percentage width
 							if (DoesSelectorTargetOnlyElementsWithTagNames(directParentSelector, new[] { "img" }))
 							{
-								if (value.EndsWith("%"))
+								if (IsPercentageMeasurement(value))
 								{
 									if (value != "100%")
 										throw new AllMeasurementsMustBePixelsNotAppliedException("The only allow percentage width for img is 100%", fragment);
@@ -175,6 +173,8 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 							}
 						}
 					}
+					
+					// Check for measurements that are a numeric value and a unit string, where the unit string is any other than "px"
 					foreach (var disallowedMeasurementUnit in DisallowedMeasurementUnits)
 					{
 						if (!value.EndsWith(disallowedMeasurementUnit, StringComparison.InvariantCultureIgnoreCase))
@@ -184,6 +184,11 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 						if (float.TryParse(value.Substring(0, value.Length - disallowedMeasurementUnit.Length).Trim(), out numericValue))
 							throw new AllMeasurementsMustBePixelsNotAppliedException(fragment);
 					}
+
+					// If the measurement is a percentage that wasn't caught above then either it's not valid or it uses the "percentage(0.1)" format, either way
+					// it's not allowed at this point
+					if (IsPercentageMeasurement(value))
+						throw new AllMeasurementsMustBePixelsNotAppliedException(fragment);
 				}
 
 				// Specific tests for disallowed measurement types
@@ -201,6 +206,14 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 					}
 				}
 			}
+		}
+
+		private bool IsPercentageMeasurement(string value)
+		{
+			if (value == null)
+				throw new ArgumentNullException("value");
+
+			return value.EndsWith("%") || value.StartsWith("percentage(", StringComparison.InvariantCultureIgnoreCase);
 		}
 
 		private static readonly string[] DisallowedMeasurementUnits = Constants.MeasurementUnits.Except(new[] { "px" }).ToArray();

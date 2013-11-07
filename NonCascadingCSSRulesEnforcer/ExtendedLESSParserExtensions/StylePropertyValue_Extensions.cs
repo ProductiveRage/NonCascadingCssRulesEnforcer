@@ -39,6 +39,15 @@ namespace NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions
 					continue;
 				}
 
+				// 2013-11-07 DWR: This wasn't previously identifying "percentage(0.1)", which is equivalent to "10%"
+				var percentageLabel = "percentage";
+				if (valueSection.StartsWith(percentageLabel + "(", StringComparison.InvariantCultureIgnoreCase) && valueSection.EndsWith(")"))
+				{
+					float numericValue;
+					if (float.TryParse(valueSection.Substring(percentageLabel.Length + 1, valueSection.Length - (percentageLabel.Length + 2)).Trim(), out numericValue))
+						measurementValues.Add(new Measurement(numericValue * 100, "%"));
+				}
+
 				foreach (var measurementUnit in Constants.MeasurementUnits)
 				{
 					if (!valueSection.EndsWith(measurementUnit, StringComparison.InvariantCultureIgnoreCase))

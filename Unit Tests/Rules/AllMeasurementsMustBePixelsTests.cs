@@ -185,5 +185,25 @@ namespace UnitTests.Rules
 				)).EnsureRulesAreMet(new[] { content });
 			});
 		}
+
+		/// <summary>
+		/// percent(0.1) should be disallowed in the same places that 10% is (this is an way to describe percentage measurements that I wasn't previously aware of!)
+		/// </summary>
+		[Fact]
+		public void PercentageKeywordWorkaroundIsCaught()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"p",
+				CSSFragmentBuilderStyleProperty.New("width", "percentage(0.1)")
+			).ToContainerFragment();
+
+			Assert.Throws<AllMeasurementsMustBePixels.AllMeasurementsMustBePixelsNotAppliedException>(() =>
+			{
+				(new AllMeasurementsMustBePixels(
+					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
+					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+				)).EnsureRulesAreMet(new[] { content });
+			});
+		}
 	}
 }

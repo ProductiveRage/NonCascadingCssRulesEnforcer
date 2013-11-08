@@ -73,6 +73,37 @@
             the string will have been trimmed. This will always have some content and never be null or blank.
             </summary>
         </member>
+        <member name="M:CSSParser.ExtendedLESSParser.Misc.SelectorBreaker.Break(System.String)">
+            <summary>
+            Given a selectors string (eg. "div.formData input[type='hidden'], div.entry p label"), return a set of selectors where each selector is broken
+            into selector segment strings (eg. [ [ "div.formData", "input[type='hidden']" ], [ "div.entry", "p", "label" ] ])
+            </summary>
+        </member>
+        <member name="M:CSSParser.ExtendedLESSParser.Misc.SelectorBreaker.IProcessSelectorContent.Process(System.Char)">
+            <summary>
+            This will never return null, it will raise an exception if unable to process the content
+            </summary>
+        </member>
+        <member name="M:CSSParser.ExtendedLESSParser.Misc.SelectorBreaker.DefaultSelectorProcessor.Process(System.Char)">
+            <summary>
+            This will never return null, it will raise an exception if unable to process the content
+            </summary>
+        </member>
+        <member name="M:CSSParser.ExtendedLESSParser.Misc.SelectorBreaker.AttributeSelectorProcessor.Process(System.Char)">
+            <summary>
+            This will never return null, it will raise an exception if unable to process the content
+            </summary>
+        </member>
+        <member name="M:CSSParser.ExtendedLESSParser.Misc.SelectorBreaker.QuotedSelectorProcessor.Process(System.Char)">
+            <summary>
+            This will never return null, it will raise an exception if unable to process the content
+            </summary>
+        </member>
+        <member name="P:CSSParser.ExtendedLESSParser.Misc.SelectorBreaker.SelectorProcessorResult.NextProcessor">
+            <summary>
+            This will never be null
+            </summary>
+        </member>
         <member name="P:CSSParser.ExtendedLESSParser.ContentSections.StylePropertyName.Value">
             <summary>
             This will never be null or blank, its value will always be trimmed

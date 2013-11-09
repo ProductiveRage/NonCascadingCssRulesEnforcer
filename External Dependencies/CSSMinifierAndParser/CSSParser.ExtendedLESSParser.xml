@@ -4,11 +4,14 @@
         <name>CSSParser.ExtendedLESSParser</name>
     </assembly>
     <members>
-        <member name="T:CSSParser.ExtendedLESSParser.ContentSections.Import">
+        <member name="T:CSSParser.ExtendedLESSParser.ContentSections.Selector">
             <summary>
-            This ContainerFragment represent a Media Query, its Selectors SelectorSet should only have a single value (unlike the Selector class which may have multiple
-            Selectors - eg. "div#Header h2, div#Footer"). LESS CSS supports Media Queries that wrap styles and/or other selectors whilst regular CSS only supports the
-            wrapping of selectors in Media Queries.
+            This is a CSS fragment that represents a selector string, it may be multiple comma-separated selectors (if so, then the Selectors property will have multiple entries)
+            </summary>
+        </member>
+        <member name="T:CSSParser.ExtendedLESSParser.ContentSections.ContainerFragment">
+            <summary>
+            This is a CSS fragment that represents contains other fragments - eg. a Selector or Media Query
             </summary>
         </member>
         <member name="T:CSSParser.ExtendedLESSParser.ContentSections.ICSSFragment">
@@ -20,21 +23,6 @@
         <member name="P:CSSParser.ExtendedLESSParser.ContentSections.ICSSFragment.SourceLineIndex">
             <summary>
             This will always be zero or greater
-            </summary>
-        </member>
-        <member name="P:CSSParser.ExtendedLESSParser.ContentSections.Import.ImportContent">
-            <summary>
-            This will never be null or blank
-            </summary>
-        </member>
-        <member name="P:CSSParser.ExtendedLESSParser.ContentSections.Import.SourceLineIndex">
-            <summary>
-            This will always be zero or greater
-            </summary>
-        </member>
-        <member name="T:CSSParser.ExtendedLESSParser.ContentSections.ContainerFragment">
-            <summary>
-            This is a CSS fragment that represents contains other fragments - eg. a Selector or Media Query
             </summary>
         </member>
         <member name="P:CSSParser.ExtendedLESSParser.ContentSections.ContainerFragment.Selectors">
@@ -71,6 +59,29 @@
             <summary>
             All whitespace characters will have been replaced with spaces, then any runs of spaces replaced with single instances and finally
             the string will have been trimmed. This will always have some content and never be null or blank.
+            </summary>
+        </member>
+        <member name="P:CSSParser.ExtendedLESSParser.ContentSections.StylePropertyValue.Property">
+            <summary>
+            This will never be null
+            </summary>
+        </member>
+        <member name="P:CSSParser.ExtendedLESSParser.ContentSections.StylePropertyValue.ValueSegments">
+            <summary>
+            This will never be null empty or contain any null or blank values, all of the strings will have been trimmed
+            </summary>
+        </member>
+        <member name="P:CSSParser.ExtendedLESSParser.ContentSections.StylePropertyValue.SourceLineIndex">
+            <summary>
+            This will always be zero or greater
+            </summary>
+        </member>
+        <member name="T:CSSParser.ExtendedLESSParser.LessCssHierarchicalParser">
+            <summary>
+            This will take the data returned from the CSSParser.Parser methods and process it further into a hierarchical set of ICSSFragment instances
+            where each fragment is a selector (which may represent a css selector - eg. "div.Header" - or media query) or style property names and
+            values within the selectors. Selectors may be nested in the case of selectors within media queries or selectors nested within other
+            selectors (as enabled by LESS CSS).
             </summary>
         </member>
         <member name="M:CSSParser.ExtendedLESSParser.Misc.SelectorBreaker.Break(System.String)">
@@ -114,25 +125,19 @@
             This will always be zero or greater
             </summary>
         </member>
-        <member name="T:CSSParser.ExtendedLESSParser.LessCssHierarchicalParser">
+        <member name="T:CSSParser.ExtendedLESSParser.ContentSections.Import">
             <summary>
-            This will take the data returned from the CSSParser.Parser methods and process it further into a hierarchical set of ICSSFragment instances
-            where each fragment is a selector (which may represent a css selector - eg. "div.Header" - or media query) or style property names and
-            values within the selectors. Selectors may be nested in the case of selectors within media queries or selectors nested within other
-            selectors (as enabled by LESS CSS).
+            This ContainerFragment represent a Media Query, its Selectors SelectorSet should only have a single value (unlike the Selector class which may have multiple
+            Selectors - eg. "div#Header h2, div#Footer"). LESS CSS supports Media Queries that wrap styles and/or other selectors whilst regular CSS only supports the
+            wrapping of selectors in Media Queries.
             </summary>
         </member>
-        <member name="P:CSSParser.ExtendedLESSParser.ContentSections.StylePropertyValue.Property">
+        <member name="P:CSSParser.ExtendedLESSParser.ContentSections.Import.ImportContent">
             <summary>
-            This will never be null
+            This will never be null or blank
             </summary>
         </member>
-        <member name="P:CSSParser.ExtendedLESSParser.ContentSections.StylePropertyValue.ValueSegments">
-            <summary>
-            This will never be null empty or contain any null or blank values, all of the strings will have been trimmed
-            </summary>
-        </member>
-        <member name="P:CSSParser.ExtendedLESSParser.ContentSections.StylePropertyValue.SourceLineIndex">
+        <member name="P:CSSParser.ExtendedLESSParser.ContentSections.Import.SourceLineIndex">
             <summary>
             This will always be zero or greater
             </summary>
@@ -142,11 +147,6 @@
             This ContainerFragment represent a Media Query, its Selectors SelectorSet should only have a single value (unlike the Selector class which may have multiple
             Selectors - eg. "div#Header h2, div#Footer"). LESS CSS supports Media Queries that wrap styles and/or other selectors whilst regular CSS only supports the
             wrapping of selectors in Media Queries.
-            </summary>
-        </member>
-        <member name="T:CSSParser.ExtendedLESSParser.ContentSections.Selector">
-            <summary>
-            This is a CSS fragment that represents a selector string, it may be multiple comma-separated selectors (if so, then the Selectors property will have multiple entries)
             </summary>
         </member>
     </members>

@@ -85,6 +85,7 @@ namespace Tester
 				baseContentLoader =>
 					new EnhancedNonCachedLessCssLoaderFactory(
 						baseContentLoader,
+						SourceMappingMarkerInjectionOptions.DoNotInject,
 						ErrorBehaviourOptions.LogAndRaiseException,
 						new NullLogger()
 					).Get()

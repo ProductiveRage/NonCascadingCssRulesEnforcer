@@ -50,6 +50,7 @@
     <Compile Include="ExtendedLESSParserExtensions\Selector_Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rules\BrokenRuleEncounteredException.cs" />
+    <Compile Include="Rules\Compatibility\LegacyIESelectorLimitMustBeRespected.cs" />
     <Compile Include="Rules\HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets.cs" />
     <Compile Include="Rules\AllMeasurementsMustBePixels.cs" />
     <Compile Include="Rules\BorderWidthMustBeFullySpecifiedIfSpecifiedAtAll.cs" />

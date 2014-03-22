@@ -205,5 +205,25 @@ namespace UnitTests.Rules
 				)).EnsureRulesAreMet(new[] { content });
 			});
 		}
+
+		/// <summary>
+		/// When the AllowOneHundredPercentOnAnyElementAndProperty behaviour is specified then any element should be allowed to be set to 100% or 100% !important
+		/// (the latter is being tested for explicitly here since a logic error previously was not allowing it)
+		/// </summary>
+		[Fact]
+		public void HundredPercentWidthImportantIsAcceptedWhenAllowingAnyElementToBeHundredPercentWidth()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"a",
+				CSSFragmentBuilderStyleProperty.New("width", "100% !important")
+			).ToContainerFragment();
+
+			Assert.DoesNotThrow(() =>
+			{
+				(new AllMeasurementsMustBePixels(
+					AllMeasurementsMustBePixels.ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty
+				)).EnsureRulesAreMet(new[] { content });
+			});
+		}
 	}
 }

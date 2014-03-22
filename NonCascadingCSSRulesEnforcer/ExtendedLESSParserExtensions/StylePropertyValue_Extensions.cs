@@ -7,20 +7,6 @@ namespace NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions
 	public static class StylePropertyValue_Extensions
 	{
 		/// <summary>
-		/// This performs a case-insensitive match against the combined ValueSegments set of a property value (the segments are combined by joining around
-		/// single space characters)
-		/// </summary>
-		public static bool HasValue(this StylePropertyValue source, string value)
-		{
-			if (source == null)
-				throw new ArgumentNullException("source");
-			if (value == null)
-				throw new ArgumentNullException("value");
-
-			return string.Join(" ", source.ValueSegments).Equals(value, StringComparison.InvariantCultureIgnoreCase);
-		}
-
-		/// <summary>
 		/// Extract any measurements from a property value - eg. "3px solid black" will return a set containing a Measurement with Value 3 and Unit "px", a
 		/// value of "0" will return a set containing a Measurement with Value 0 and null Unit, a value of "2px 2px" will return a set containing two
 		/// Measurement instances, both with Value 2 and Unit "px"

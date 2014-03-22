@@ -121,7 +121,9 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				var stylePropertyValueFragmentSections = stylePropertyValueFragment.ValueSegments;
 				if ((_conformity & ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty) == ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty)
 				{
-					if (stylePropertyValueFragment.HasValue("100%"))
+					var stylePropertyValueFragmentCombinedSegments = string.Join(" ", stylePropertyValueFragment.ValueSegments);
+					if ((stylePropertyValueFragmentCombinedSegments == "100%")
+					|| stylePropertyValueFragmentCombinedSegments.Equals("100% !important", StringComparison.OrdinalIgnoreCase))
 						continue;
 				}
 				foreach (var value in stylePropertyValueFragmentSections)

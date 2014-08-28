@@ -24,6 +24,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		public enum ConformityOptions
 		{
 			AllowVerticalBorderAndPadding,
+			IgnoreRuleIfBorderBoxSizingRulePresent,
 			Strict
 		}
 
@@ -55,42 +56,62 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				//   may override, so the styles are ordered so that those without "!important" appear first and then those that do, it is the last entry
 				//   of this set that we want)
 				var propertyValues = containerFragment.ChildFragments
-					.Where(f => (f is StylePropertyValue))
-					.Cast<StylePropertyValue>()
-					.OrderBy(s => s.ValueSegments.Any(v => v.Equals("!important", StringComparison.InvariantCultureIgnoreCase)) ? 1 : 0);
+					.Select((f, i) => new { Fragment = f, Index = i })
+					.Where(f => f.Fragment is StylePropertyValue)
+					.Select(f => new { PropertyValueFragment = (StylePropertyValue)f.Fragment, Index = f.Index })
+					.OrderBy(f => f.PropertyValueFragment.ValueSegments.Any(v => v.Equals("!important", StringComparison.InvariantCultureIgnoreCase)) ? 1 : 0)
+					.ThenBy(f => f.Index)
+					.Select(f => f.PropertyValueFragment);
 				var lastWidthPropertyIfAny = propertyValues.LastOrDefault(p => p.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase));
 				var isWidthDefined = (
 					(lastWidthPropertyIfAny != null) &&
 					!!lastWidthPropertyIfAny.GetValueSectionsThatAreMeasurements().Any()
 				);
 
-				// If a width has been explicitly set then ensure that no properties are present that violate this rule
+				// If a width has been explicitly set then ensure that no properties are present that violate this rule (2014-08-28: Unless "border-box"
+				// has been set for the "box-sizing" property and the confirmity setting has been enabled which allows this). Requiring the "border-box"
+				// style to appear within any block that requires it means it's very easy to tell at a glance whether the block requires a modern browser
+				// (in this case, that means *not* IE7, since IE7 doesn't support "box-sizing: border-box").
 				if (isWidthDefined)
 				{
-					var paddingDimensions = new SpecifiedDimensionSummary(null, null, null, null);
-					var borderDimensions = new SpecifiedDimensionSummary(null, null, null, null);
+					var lastBorderBoxPropertyIfAny = propertyValues.LastOrDefault(p => p.Property.Value.Equals("box-sizing", StringComparison.InvariantCultureIgnoreCase));
+					bool isBorderBoxSizingSpecified;
+					if (lastBorderBoxPropertyIfAny == null)
+						isBorderBoxSizingSpecified = false;
+					else
 					{
-						foreach (var property in propertyValues)
-						{
-							paddingDimensions = ProcessAnyPaddingChanges(property, paddingDimensions);
-							borderDimensions = ProcessAnyBorderChanges(property, paddingDimensions);
-						}
+						var concatenatedPropertyValue = string.Join(", ", lastBorderBoxPropertyIfAny.ValueSegments);
+						isBorderBoxSizingSpecified =
+							concatenatedPropertyValue.Equals("border-box", StringComparison.InvariantCultureIgnoreCase) ||
+							concatenatedPropertyValue.Equals("border-box !important", StringComparison.InvariantCultureIgnoreCase);
 					}
+					if (!isBorderBoxSizingSpecified || (_conformity != ConformityOptions.IgnoreRuleIfBorderBoxSizingRulePresent))
+					{
+						var paddingDimensions = new SpecifiedDimensionSummary(null, null, null, null);
+						var borderDimensions = new SpecifiedDimensionSummary(null, null, null, null);
+						{
+							foreach (var property in propertyValues)
+							{
+								paddingDimensions = ProcessAnyPaddingChanges(property, paddingDimensions);
+								borderDimensions = ProcessAnyBorderChanges(property, paddingDimensions);
+							}
+						}
 
-					// Check whether any property has been identified as setting a border or padding dimension
-					// - Unless ConformityOptions.Strict behaviour is enabled, ignore the vertial (Top/Bottom) values, the horizontal
-					//   ones are of greater importance in relation to width
-					var invalidProperty =
-						((_conformity == ConformityOptions.Strict) ? paddingDimensions.PropertyWithNonZeroTopValueIfAny : null) ??
-						paddingDimensions.PropertyWithNonZeroRightValueIfAny ??
-						((_conformity == ConformityOptions.Strict) ? paddingDimensions.PropertyWithNonZeroBottomValueIfAny : null) ??
-						paddingDimensions.PropertyWithNonZeroLeftValueIfAny ??
-						((_conformity == ConformityOptions.Strict) ? borderDimensions.PropertyWithNonZeroTopValueIfAny : null) ??
-						borderDimensions.PropertyWithNonZeroRightValueIfAny ??
-						((_conformity == ConformityOptions.Strict) ? borderDimensions.PropertyWithNonZeroBottomValueIfAny : null) ??
-						borderDimensions.PropertyWithNonZeroLeftValueIfAny;
-					if (invalidProperty != null)
-						throw new BorderAndPaddingMayNotBeCombinedWithWidthException(invalidProperty);
+						// Check whether any property has been identified as setting a border or padding dimension
+						// - Unless ConformityOptions.Strict behaviour is enabled, ignore the vertial (Top/Bottom) values, the horizontal
+						//   ones are of greater importance in relation to width
+						var invalidProperty =
+							((_conformity == ConformityOptions.Strict) ? paddingDimensions.PropertyWithNonZeroTopValueIfAny : null) ??
+							paddingDimensions.PropertyWithNonZeroRightValueIfAny ??
+							((_conformity == ConformityOptions.Strict) ? paddingDimensions.PropertyWithNonZeroBottomValueIfAny : null) ??
+							paddingDimensions.PropertyWithNonZeroLeftValueIfAny ??
+							((_conformity == ConformityOptions.Strict) ? borderDimensions.PropertyWithNonZeroTopValueIfAny : null) ??
+							borderDimensions.PropertyWithNonZeroRightValueIfAny ??
+							((_conformity == ConformityOptions.Strict) ? borderDimensions.PropertyWithNonZeroBottomValueIfAny : null) ??
+							borderDimensions.PropertyWithNonZeroLeftValueIfAny;
+						if (invalidProperty != null)
+							throw new BorderAndPaddingMayNotBeCombinedWithWidthException(invalidProperty);
+					}
 				}
 				
 				EnsureRulesAreMet(containerFragment.ChildFragments);

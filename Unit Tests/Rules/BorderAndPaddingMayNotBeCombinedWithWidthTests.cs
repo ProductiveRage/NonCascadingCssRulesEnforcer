@@ -127,6 +127,23 @@ namespace UnitTests.Rules
 		}
 
 		[Fact]
+		public void WidthWithNonZeroPixelPaddingIsAllowedIfBorderBoxIsEnabled()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"div",
+				CSSFragmentBuilderStyleProperty.New("box-sizing", "border-box"),
+				CSSFragmentBuilderStyleProperty.New("width", "320px"),
+				CSSFragmentBuilderStyleProperty.New("padding", "16px")
+			).ToContainerFragment();
+
+			Assert.DoesNotThrow(() =>
+			{
+				var confirmity = BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.IgnoreRuleIfBorderBoxSizingRulePresent;
+				(new BorderAndPaddingMayNotBeCombinedWithWidth(confirmity)).EnsureRulesAreMet(new[] { content });
+			});
+		}
+
+		[Fact]
 		public void WidthWithBorderNoneIsFine()
 		{
 			var content = CSSFragmentBuilderSelector.New(

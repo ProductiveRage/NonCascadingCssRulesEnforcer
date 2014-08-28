@@ -15,17 +15,21 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		private readonly ConformityOptions _conformity;
 		public BorderAndPaddingMayNotBeCombinedWithWidth(ConformityOptions conformity)
 		{
-			if (!Enum.IsDefined(typeof(ConformityOptions), conformity))
-				throw new ArgumentOutOfRangeException("conformity");
+			if ((_conformity != ConformityOptions.Strict)
+			&& (_conformity != ConformityOptions.AllowVerticalBorderAndPadding)
+			&& (_conformity != ConformityOptions.IgnoreRuleIfBorderBoxSizingRulePresent)
+			&& (_conformity != (ConformityOptions.AllowVerticalBorderAndPadding | ConformityOptions.IgnoreRuleIfBorderBoxSizingRulePresent)))
+				throw new ArgumentOutOfRangeException("conformity", "invalid value or combination of values");
 
 			_conformity = conformity;
 		}
 
+		[Flags]
 		public enum ConformityOptions
 		{
-			AllowVerticalBorderAndPadding,
-			IgnoreRuleIfBorderBoxSizingRulePresent,
-			Strict
+			Strict = 0,
+			AllowVerticalBorderAndPadding = 1,
+			IgnoreRuleIfBorderBoxSizingRulePresent = 2
 		}
 
 		public bool DoesThisRuleApplyTo(StyleSheetTypeOptions styleSheetType)
@@ -85,7 +89,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 							concatenatedPropertyValue.Equals("border-box", StringComparison.InvariantCultureIgnoreCase) ||
 							concatenatedPropertyValue.Equals("border-box !important", StringComparison.InvariantCultureIgnoreCase);
 					}
-					if (!isBorderBoxSizingSpecified || (_conformity != ConformityOptions.IgnoreRuleIfBorderBoxSizingRulePresent))
+					if (!isBorderBoxSizingSpecified || ((_conformity & ConformityOptions.IgnoreRuleIfBorderBoxSizingRulePresent) == 0))
 					{
 						var paddingDimensions = new SpecifiedDimensionSummary(null, null, null, null);
 						var borderDimensions = new SpecifiedDimensionSummary(null, null, null, null);

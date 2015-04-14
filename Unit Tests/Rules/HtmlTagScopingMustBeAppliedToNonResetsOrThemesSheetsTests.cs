@@ -43,19 +43,34 @@ namespace UnitTests.Rules
 			});
 		}
 
-		[Fact]
-		public void HtmlTagWithStylePropertiesIsNotAcceptable()
-		{
-			var content = CSSFragmentBuilderSelector.New(
-				"html",
-				CSSFragmentBuilderStyleProperty.New("color", "black")
-			).ToContainerFragment();
+        [Fact]
+        public void HtmlTagWithStylePropertiesIsNotAcceptable()
+        {
+            var content = CSSFragmentBuilderSelector.New(
+                "html",
+                CSSFragmentBuilderStyleProperty.New("color", "black")
+            ).ToContainerFragment();
 
-			Assert.Throws<HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets.ScopeRestrictingHtmlTagNotAppliedException>(() =>
-			{
-				(new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets()).EnsureRulesAreMet(new[] { content });
-			});
-		}
+            Assert.Throws<HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets.ScopeRestrictingHtmlTagNotAppliedException>(() =>
+            {
+                (new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets()).EnsureRulesAreMet(new[] { content });
+            });
+        }
+
+        [Fact]
+        public void HtmlTagWithStylePropertiesAfterLessTagIsNotAcceptable()
+        {
+            var content = CSSFragmentBuilderSelector.New(
+                "html",
+                CSSFragmentBuilderStyleProperty.New("@backgroundColor", "black"),
+                CSSFragmentBuilderStyleProperty.New("color", "@backgroundColor")
+            ).ToContainerFragment();
+
+            Assert.Throws<HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets.ScopeRestrictingHtmlTagNotAppliedException>(() =>
+            {
+                (new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets()).EnsureRulesAreMet(new[] { content });
+            });
+        }
 
 		[Fact]
 		public void HtmlTagWithMediaQueryWrappedStylePropertiesIsNotAcceptable()

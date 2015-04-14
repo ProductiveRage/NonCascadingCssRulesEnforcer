@@ -25,29 +25,20 @@ namespace NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions
 			// properties will invalidate the html as being for scope-restriction purposes (as the styles will apply to the html tag when the media
 			// query criteria are met). The RemoveMediaQueries extension will transform the data as if the media queries were not present in the
 			// source content (any styles inside media queries will be lifted up to the level at which the media query appeared).
-			var previousFragmentWasLESSValue = false;
 			foreach (var childFragment in source.ChildFragments.RemoveMediaQueries())
 			{
-				if ((childFragment is StylePropertyName) && ((StylePropertyName)childFragment).Value.StartsWith("@"))
-				{
-					previousFragmentWasLESSValue = true;
-					break;
-				}
-
 				if (childFragment is StylePropertyName)
 				{
-					if (!previousFragmentWasLESSValue)
-						return false;
-
-					previousFragmentWasLESSValue = false;
-					continue;
+                    if (((StylePropertyName)childFragment).Value.StartsWith("@"))
+                        continue;
+                    return false;
 				}
+
+                if (childFragment is StylePropertyValue)
+                    continue;
 
 				if ((childFragment is Selector) || (childFragment is MediaQuery))
-				{
-					previousFragmentWasLESSValue = false;
 					continue;
-				}
 
 				throw new Exception("Unsupported fragment type encountered: " + childFragment.GetType());
 			}

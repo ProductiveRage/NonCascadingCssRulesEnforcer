@@ -45,14 +45,17 @@ namespace Tester
 
 
 
-			var pathMapper = new FixedPathMapper(@"C:\Users\Me\Documents\Visual Studio 2010\Projects\Blog\Blog\Content");
-			var loader = new RuleEnforcingCssFileLoader(
+			//var pathMapper = new FixedPathMapper(@"C:\Users\Me\Documents\Visual Studio 2010\Projects\Blog\Blog\Content");
+            //var pathMapper = new FixedPathMapper(@"D:\CSS\noncascadingcssrulesenforcer\Tester\Content");
+            //var pathMapper = new FixedPathMapper(@"W:\ETWP sites\liverpool\liverpool.etwp.dev.nm\styles");
+            var pathMapper = new FixedPathMapper(@"C:\Users\dpons\Desktop\TestBed");
+            var loader = new RuleEnforcingCssFileLoader(
 				new IEnforceRules[]
 				{
 					new AllMeasurementsMustBePixels(
 						AllMeasurementsMustBePixels.ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty |
 						AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
-						AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+						new[] { "div", "td", "th", "li" }
 					),
 					new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets(),
 					new BorderAndPaddingMayNotBeCombinedWithWidth(
@@ -76,7 +79,9 @@ namespace Tester
 					var lowerCasedTrimmedRelativePath = relativePath.Trim().ToLower();
 					if (lowerCasedTrimmedRelativePath.EndsWith("resets.css") || lowerCasedTrimmedRelativePath.EndsWith("resets.less"))
 						return StyleSheetTypeOptions.Reset;
-					else if (lowerCasedTrimmedRelativePath.EndsWith("theme.css") || lowerCasedTrimmedRelativePath.EndsWith("theme.less"))
+					else if (lowerCasedTrimmedRelativePath.EndsWith("theme.css") || lowerCasedTrimmedRelativePath.EndsWith("theme.less")
+                    || lowerCasedTrimmedRelativePath.EndsWith("breakpoints.css") || lowerCasedTrimmedRelativePath.EndsWith("breakpoints.less")
+                    || lowerCasedTrimmedRelativePath.EndsWith("mixinsandvalues.css") || lowerCasedTrimmedRelativePath.EndsWith("mixinsandvalues.less"))
 						return StyleSheetTypeOptions.Themes;
 					else
 						return StyleSheetTypeOptions.Other;

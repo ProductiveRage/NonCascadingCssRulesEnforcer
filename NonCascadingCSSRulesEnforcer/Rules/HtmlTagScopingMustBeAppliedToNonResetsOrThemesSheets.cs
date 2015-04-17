@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using CSSParser.ExtendedLESSParser.ContentSections;
+﻿using CSSParser.ExtendedLESSParser.ContentSections;
 using NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
 
 namespace NonCascadingCSSRulesEnforcer.Rules
 {
@@ -27,23 +29,34 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// </summary>
 		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
 		{
-			if (fragments == null)
-				throw new ArgumentNullException("fragments");
+            if (fragments == null)
+                throw new ArgumentNullException("fragments");
 
-			foreach (var fragment in fragments)
-			{
-				if (fragment == null)
-					throw new ArgumentException("Null reference encountered in fragments set");
+            var brokenRules = GetAnyBrokenRules(fragments);
+            if (brokenRules.Any())
+                throw brokenRules.First();
+        }
 
-				// Ignore @import statements in non-compiled content
-				if (fragment is Import)
-					continue;
+        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+        {
+            if (fragments == null)
+                throw new ArgumentNullException("fragments");
 
-				var selectorFragment = fragment as Selector;
-				if ((selectorFragment == null) || !selectorFragment.IsScopeRestrictingHtmlTag())
-					throw new ScopeRestrictingHtmlTagNotAppliedException(fragment);
-			}
-		}
+            var brokenRules = new List<BrokenRuleEncounteredException>();
+            foreach (var fragment in fragments)
+            {
+                if (fragment == null)
+                    throw new ArgumentException("Encountered null fragment - invalid");
+
+                // Ignore @import statements in non-compiled content
+                if (fragment is Import)
+                    continue;
+
+                var selectorFragment = fragment as Selector;
+                if ((selectorFragment == null) || !selectorFragment.IsScopeRestrictingHtmlTag())
+                    yield return new ScopeRestrictingHtmlTagNotAppliedException(fragment);
+            }
+        }
 
 		public class ScopeRestrictingHtmlTagNotAppliedException : BrokenRuleEncounteredException
 		{

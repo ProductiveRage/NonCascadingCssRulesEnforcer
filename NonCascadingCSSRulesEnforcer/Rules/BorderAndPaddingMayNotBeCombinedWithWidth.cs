@@ -46,6 +46,15 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// </summary>
 		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
 		{
+            IEnumerable<BrokenRuleEncounteredException> brokenRules = GetAnyBrokenRules(fragments);
+            if (brokenRules.Any())
+                throw brokenRules.First();
+        }
+
+        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+        {
+            List<BrokenRuleEncounteredException> brokenRules = new List<BrokenRuleEncounteredException>();
+
 			if (fragments == null)
 				throw new ArgumentNullException("fragments");
 
@@ -113,13 +122,14 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 							borderDimensions.PropertyWithNonZeroRightValueIfAny ??
 							((_conformity == ConformityOptions.Strict) ? borderDimensions.PropertyWithNonZeroBottomValueIfAny : null) ??
 							borderDimensions.PropertyWithNonZeroLeftValueIfAny;
-						if (invalidProperty != null)
-							throw new BorderAndPaddingMayNotBeCombinedWithWidthException(invalidProperty);
+                        if (invalidProperty != null)
+                            brokenRules.Add(new BorderAndPaddingMayNotBeCombinedWithWidthException(invalidProperty));
 					}
 				}
-				
-				EnsureRulesAreMet(containerFragment.ChildFragments);
+
+                brokenRules = brokenRules.Concat(GetAnyBrokenRules(containerFragment.ChildFragments)).ToList();
 			}
+            return brokenRules;
 		}
 
 		private SpecifiedDimensionSummary ProcessAnyPaddingChanges(StylePropertyValue property, SpecifiedDimensionSummary dimensionsSummary)

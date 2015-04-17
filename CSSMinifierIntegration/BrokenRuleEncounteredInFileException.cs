@@ -18,6 +18,9 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			if (string.IsNullOrWhiteSpace(relativePath))
 				throw new ArgumentException("Null/blank relativePath specified");
 
+            Console.WriteLine("brokenRuleException:" + brokenRuleException);
+            Console.WriteLine("styleSheetType:" + styleSheetType);
+            Console.WriteLine("relativePath:" + relativePath);
 			BrokenRuleException = brokenRuleException;
 			StyleSheetType = styleSheetType;
 			RelativePath = relativePath;

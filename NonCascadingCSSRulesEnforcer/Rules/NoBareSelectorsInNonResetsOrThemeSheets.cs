@@ -40,9 +40,18 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// This will throw an exception if the specified rule BrokenRuleEncounteredException is broken. It will throw an ArgumentException for a null fragments
 		/// references, or one which contains a null reference.
 		/// </summary>
-		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
+        public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
+        {
+            IEnumerable<BrokenRuleEncounteredException> brokenRules = GetAnyBrokenRules(fragments);
+            if (brokenRules.Any())
+                throw brokenRules.First();
+        }
+
+        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
 		{
-			if (fragments == null)
+            List<BrokenRuleEncounteredException> brokenRules = new List<BrokenRuleEncounteredException>();
+
+            if (fragments == null)
 				throw new ArgumentNullException("fragments");
 
 			foreach (var fragment in fragments)
@@ -56,13 +65,14 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				{
 					if (!selectorFragment.IsScopeRestrictingHtmlTag() || (_scopeRestrictingHtmlTagBehaviour == ScopeRestrictingHtmlTagBehaviourOptions.Disallow))
 					{
-						if (selectorFragment.Selectors.Any(s => !IsValidSelector(s)))
-							throw new DisallowBareSelectorsEncounteredException(selectorFragment);
+                        if (selectorFragment.Selectors.Any(s => !IsValidSelector(s)))
+                            brokenRules.Add(new DisallowBareSelectorsEncounteredException(selectorFragment));
 					}
 				}
 
-				EnsureRulesAreMet(containerFragment.ChildFragments);
+                brokenRules.Concat(GetAnyBrokenRules(containerFragment.ChildFragments)).ToList();
 			}
+            return brokenRules;
 		}
 
 		/// <summary>

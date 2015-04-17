@@ -44,6 +44,12 @@ namespace Tester
 			);
 
 
+            var aux = (new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets()).GetAnyBrokenRules(
+                LessCssHierarchicalParser.ParseIntoStructuredData(
+                    Parser.ParseLESS("div.Header, div.Footer { div.What1, div.What2 { color: red; } }")
+                )
+            );
+
 
 			//var pathMapper = new FixedPathMapper(@"C:\Users\Me\Documents\Visual Studio 2010\Projects\Blog\Blog\Content");
             //var pathMapper = new FixedPathMapper(@"D:\CSS\noncascadingcssrulesenforcer\Tester\Content");

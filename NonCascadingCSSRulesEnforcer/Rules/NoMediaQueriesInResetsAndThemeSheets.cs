@@ -25,20 +25,29 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// </summary>
 		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
 		{
-			if (fragments == null)
-				throw new ArgumentNullException("fragments");
-
-			foreach (var fragment in fragments)
-			{
-				var mediaQueryFragment = fragment as MediaQuery;
-				if (mediaQueryFragment != null)
-					throw new NoMediaQueriesAllowedException(mediaQueryFragment);
-
-				var containerFragment = fragment as ContainerFragment;
-				if (containerFragment != null)
-					EnsureRulesAreMet(containerFragment.ChildFragments);
-			}
+            IEnumerable<BrokenRuleEncounteredException> brokenRules = GetAnyBrokenRules(fragments);
+            if (brokenRules.Any())
+                throw brokenRules.First();
 		}
+
+        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+        {
+            return new List<BrokenRuleEncounteredException>();
+
+            /*if (fragments == null)
+                throw new ArgumentNullException("fragments");
+
+            foreach (var fragment in fragments)
+            {
+                var mediaQueryFragment = fragment as MediaQuery;
+                if (mediaQueryFragment != null)
+                    throw new NoMediaQueriesAllowedException(mediaQueryFragment);
+
+                var containerFragment = fragment as ContainerFragment;
+                if (containerFragment != null)
+                    EnsureRulesAreMet(containerFragment.ChildFragments);
+            }*/
+        }
 
 		public class NoMediaQueriesAllowedException : BrokenRuleEncounteredException
 		{

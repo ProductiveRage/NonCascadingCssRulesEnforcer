@@ -29,12 +29,22 @@ namespace NonCascadingCSSRulesEnforcer.Rules.Compatibility
 		/// </summary>
 		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
 		{
-			if (fragments == null)
+            IEnumerable<BrokenRuleEncounteredException> brokenRules = GetAnyBrokenRules(fragments);
+            if (brokenRules.Any())
+                throw brokenRules.First();
+        }
+
+        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+        {
+            return new List<BrokenRuleEncounteredException>();
+
+			/*if (fragments == null)
 				throw new ArgumentNullException("fragments");
 
 			var fragmentSet = new CSSFragmentSet(fragments);
 			if (fragmentSet.TotalSelectorCount > MAX_NUMBER_OF_SELECTORS)
 				throw new LegacyIESelectorLimitMustBeRespectedException(fragmentSet);
+            */
 		}
 
 		public class LegacyIESelectorLimitMustBeRespectedException : BrokenRuleEncounteredException

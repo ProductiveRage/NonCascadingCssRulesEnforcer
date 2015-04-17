@@ -46,8 +46,17 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// </summary>
 		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
 		{
-			if (fragments == null)
+            IEnumerable<BrokenRuleEncounteredException> brokenRules = GetAnyBrokenRules(fragments);
+            if (brokenRules.Any())
+                throw brokenRules.First();
+        }
+
+        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+		{
+            if (fragments == null)
 				throw new ArgumentNullException("fragments");
+
+            List<BrokenRuleEncounteredException> brokenRules = new List<BrokenRuleEncounteredException>();
 
 			foreach (var fragment in fragments)
 			{
@@ -57,14 +66,16 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 					// Mixin should contain brackets (eg. ".RounderBorders (@radius)" or ".RounderBorders ()"), while they are valid without the brackets
 					// there is no way to distinguish them from class-based selectors so we can't support their detection here
 					var lessCssMixin = selectorFragment.Selectors.First().Value.Contains("(");
-					if (!selectorFragment.IsBareSelector() && ((_conformity == ConformityOptions.Strict) || !lessCssMixin))
-						throw new OnlyAllowBareSelectorsEncounteredException(selectorFragment);
+                    if (!selectorFragment.IsBareSelector() && ((_conformity == ConformityOptions.Strict) || !lessCssMixin))
+                        brokenRules.Add(new OnlyAllowBareSelectorsEncounteredException(selectorFragment));
 				}
 
 				var containerFragment = fragment as ContainerFragment;
-				if (containerFragment != null)
-					EnsureRulesAreMet(containerFragment.ChildFragments);
+                if (containerFragment != null)
+                    brokenRules = brokenRules.Concat(GetAnyBrokenRules(containerFragment.ChildFragments)).ToList();
 			}
+
+            return brokenRules;
 		}
 
 		public class OnlyAllowBareSelectorsEncounteredException : BrokenRuleEncounteredException

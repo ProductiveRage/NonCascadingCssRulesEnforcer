@@ -71,23 +71,33 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// </summary>
 		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
 		{
-			if (fragments == null)
-				throw new ArgumentNullException("fragments");
+            IEnumerable<BrokenRuleEncounteredException> brokenRules = GetAnyBrokenRules(fragments);
+            if (brokenRules.Any())
+                throw brokenRules.First();
+        }
 
-			// TODO: (Optionally?) allow mixins to be repeated(?)
+        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+        {
+            if (fragments == null)
+                throw new ArgumentNullException("fragments");
 
-			var allSelectors = GetAllSelectors(fragments, new ContainerFragment.SelectorSet[0]);
-			if (_conformity == ConformityOptions.AllowBareSelectorsToBeRepeated)
-				allSelectors = allSelectors.Where(s => !s.Selector.OnlyTargetsBareSelectors());
+            // TODO: (Optionally?) allow mixins to be repeated(?)
 
-			var usedSelectorLookup = new Dictionary<string, ICSSFragment>();
-			foreach (var selector in allSelectors.Select(s => new { Source = s.Source, Value = string.Join(" ", s.Selector.Select(v => v.Value)) }))
-			{
-				if (usedSelectorLookup.ContainsKey(selector.Value))
-					throw new NoSelectorMayBeRepeatedInTheRulesException(usedSelectorLookup[selector.Value], selector.Value);
-				usedSelectorLookup.Add(selector.Value, selector.Source);
-			}
-		}
+            var allSelectors = GetAllSelectors(fragments, new ContainerFragment.SelectorSet[0]);
+            if (_conformity == ConformityOptions.AllowBareSelectorsToBeRepeated)
+                allSelectors = allSelectors.Where(s => !s.Selector.OnlyTargetsBareSelectors());
+
+            var usedSelectorLookup = new Dictionary<string, ICSSFragment>();
+            foreach (var selector in allSelectors.Select(s => new { Source = s.Source, Value = string.Join(" ", s.Selector.Select(v => v.Value)) }))
+            {
+                if (usedSelectorLookup.ContainsKey(selector.Value))
+                {
+                    yield return new NoSelectorMayBeRepeatedInTheRulesException(usedSelectorLookup[selector.Value], selector.Value);
+                    continue;
+                }
+                usedSelectorLookup.Add(selector.Value, selector.Source);
+            }
+        }
 
 		private IEnumerable<SelectorSetWithSourceFragment> GetAllSelectors(IEnumerable<ICSSFragment> fragments, IEnumerable<ContainerFragment.SelectorSet> parentSelectors)
 		{

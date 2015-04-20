@@ -157,10 +157,7 @@ namespace UnitTests.Rules
             var ruleEnforcer = new NoSelectorMayBeRepeatedInTheRules(
                 NoSelectorMayBeRepeatedInTheRules.ConformityOptions.AllowBareSelectorsToBeRepeated
             );
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                ruleEnforcer.GetAnyBrokenRules(null);
-            });
+            Assert.Throws<ArgumentNullException>(() => { ruleEnforcer.GetAnyBrokenRules(null).Count(); });
         }
 
         [Theory, MemberData("GetAnyBrokenRulesContent")]

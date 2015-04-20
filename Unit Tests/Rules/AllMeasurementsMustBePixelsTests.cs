@@ -212,6 +212,19 @@ namespace UnitTests.Rules
 		}
 
 
+        [Fact]
+        public void HundredPercentWidthImportantReturnsNoErrorsWhenAllowingAnyElementToBeHundredPercentWidth()
+        {
+            var content = CSSFragmentBuilderSelector.New(
+                "a",
+                CSSFragmentBuilderStyleProperty.New("width", "100% !important")
+            ).ToContainerFragment();
+
+            Assert.Equal(0, (new AllMeasurementsMustBePixels(
+                AllMeasurementsMustBePixels.ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty
+            )).GetAnyBrokenRules(new[] { content }).Count());
+        }
+
         [Theory, MemberData("GetAnyBrokenRulesErrorCountContent")]
         public void GetAnyBrokenRulesErrorCount(int Id, ICSSFragment content, int expectedErrors)
         {
@@ -240,7 +253,7 @@ namespace UnitTests.Rules
                 new object[] {8,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("border", "thick solid black")).ToContainerFragment() ,1},
                 new object[] {9,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("margin", "0 auto")).ToContainerFragment() ,0},
                 new object[] {10,CSSFragmentBuilderSelector.New("p",CSSFragmentBuilderStyleProperty.New("width", "percentage(0.1)")).ToContainerFragment() ,1},
-                new object[] {11,CSSFragmentBuilderSelector.New("a",CSSFragmentBuilderStyleProperty.New("width", "100% !important")).ToContainerFragment() ,0}
+                new object[] {11,CSSFragmentBuilderSelector.New("a",CSSFragmentBuilderStyleProperty.New("width", "100% !important")).ToContainerFragment() ,1}
                 };
             }
         }

@@ -55,8 +55,9 @@ namespace Tester
             //var pathMapper = new FixedPathMapper(@"D:\CSS\noncascadingcssrulesenforcer\Tester\Content");
             //var pathMapper = new FixedPathMapper(@"W:\ETWP sites\liverpool\liverpool.etwp.dev.nm\styles");
             var pathMapper = new FixedPathMapper(@"C:\Users\dpons\Desktop\TestBed");
+            
             var loader = new RuleEnforcingCssFileLoader(
-				new IEnforceRules[]
+                new IEnforceRules[]
 				{
 					new AllMeasurementsMustBePixels(
 						AllMeasurementsMustBePixels.ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty |
@@ -80,32 +81,38 @@ namespace Tester
 					),
 					new PaddingMustBeFullySpecifiedIfSpecifiedAtAll()
 				},
-				relativePath =>
-				{
-					var lowerCasedTrimmedRelativePath = relativePath.Trim().ToLower();
-					if (lowerCasedTrimmedRelativePath.EndsWith("resets.css") || lowerCasedTrimmedRelativePath.EndsWith("resets.less"))
-						return StyleSheetTypeOptions.Reset;
-					else if (lowerCasedTrimmedRelativePath.EndsWith("theme.css") || lowerCasedTrimmedRelativePath.EndsWith("theme.less")
+                relativePath =>
+                {
+                    var lowerCasedTrimmedRelativePath = relativePath.Trim().ToLower();
+                    if (lowerCasedTrimmedRelativePath.EndsWith("resets.css") || lowerCasedTrimmedRelativePath.EndsWith("resets.less"))
+                        return StyleSheetTypeOptions.Reset;
+                    else if (lowerCasedTrimmedRelativePath.EndsWith("theme.css") || lowerCasedTrimmedRelativePath.EndsWith("theme.less")
                     || lowerCasedTrimmedRelativePath.EndsWith("breakpoints.css") || lowerCasedTrimmedRelativePath.EndsWith("breakpoints.less")
                     || lowerCasedTrimmedRelativePath.EndsWith("mixinsandvalues.css") || lowerCasedTrimmedRelativePath.EndsWith("mixinsandvalues.less"))
-						return StyleSheetTypeOptions.Themes;
-					else
-						return StyleSheetTypeOptions.Other;
-				},
-				new SimpleTextFileContentLoader(pathMapper),
-				baseContentLoader =>
-					new EnhancedNonCachedLessCssLoaderFactory(
-						baseContentLoader,
-						SourceMappingMarkerInjectionOptions.DoNotInject,
-						ErrorBehaviourOptions.LogAndRaiseException,
-						new NullLogger()
-					).Get()
-			);
-			Console.WriteLine(
-				loader.Load("Styles.less").Content
-			);
+                        return StyleSheetTypeOptions.Themes;
+                    else
+                        return StyleSheetTypeOptions.Other;
+                },
+                new SimpleTextFileContentLoader(pathMapper),
+                baseContentLoader =>
+                    new EnhancedNonCachedLessCssLoaderFactory(
+                        baseContentLoader,
+                        SourceMappingMarkerInjectionOptions.DoNotInject,
+                        ErrorBehaviourOptions.LogAndRaiseException,
+                        new NullLogger()
+                    ).Get(),
+                    PrintError
+            );
+            Console.WriteLine(
+                loader.Load("Styles.less").Content
+            );
 			Console.ReadLine();
 		}
+
+        static void PrintError(BrokenRuleEncounteredInFileException param)
+        {
+            Console.WriteLine(param.Message);
+        }
 
 		private class FixedPathMapper : IRelativePathMapper
 		{

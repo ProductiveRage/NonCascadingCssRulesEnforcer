@@ -74,7 +74,8 @@ namespace NonCascadingCSSRulesEnforcer.Rules
             if (!Enum.IsDefined(typeof(StyleSheetTypeOptions), styleSheetType))
                 throw new ArgumentOutOfRangeException("styleSheetType");
 
-            return true;
+            //return true;
+            return (styleSheetType != StyleSheetTypeOptions.Compiled && styleSheetType != StyleSheetTypeOptions.Combined);
         }
 
         /// <summary>

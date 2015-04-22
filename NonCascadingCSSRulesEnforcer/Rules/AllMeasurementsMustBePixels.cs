@@ -58,8 +58,8 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				throw new ArgumentOutOfRangeException("styleSheetType");
 
 			// This can't be applied to compiled stylesheets as the ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypesntageWidthDivs option specifies that img elements
-			// are allowed width:100% if the style is nested within a div that has percentage width (when the rules are compiled this nesting will no longer be possible)
-			return (styleSheetType != StyleSheetTypeOptions.Compiled);
+			// are allowed width:100% if the style is nested within a div that has percentage width (when the rules are compiled or combined this nesting will no longer be possible)
+            return (styleSheetType != StyleSheetTypeOptions.Compiled && styleSheetType != StyleSheetTypeOptions.Combined);
 		}
 
 		[Flags]

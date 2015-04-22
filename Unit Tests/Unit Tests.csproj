@@ -71,6 +71,10 @@
     <Compile Include="Shared\ICSSFragmentBuilderComponent.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CSSMinifierIntegration\CSSMinifierIntegration.csproj">
+      <Project>{f738857b-1d37-4a9e-baa0-aae00af7f14a}</Project>
+      <Name>CSSMinifierIntegration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NonCascadingCSSRulesEnforcer\NonCascadingCSSRulesEnforcer.csproj">
       <Project>{652E0968-054F-40BA-87A8-6348F023080D}</Project>
       <Name>NonCascadingCSSRulesEnforcer</Name>
@@ -81,6 +85,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -56,8 +56,6 @@ namespace NonCascadingCSSRulesEnforcer.Rules
             if (fragments == null)
 				throw new ArgumentNullException("fragments");
 
-            List<BrokenRuleEncounteredException> brokenRules = new List<BrokenRuleEncounteredException>();
-
 			foreach (var fragment in fragments)
 			{
 				var selectorFragment = fragment as Selector;
@@ -67,15 +65,14 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 					// there is no way to distinguish them from class-based selectors so we can't support their detection here
 					var lessCssMixin = selectorFragment.Selectors.First().Value.Contains("(");
                     if (!selectorFragment.IsBareSelector() && ((_conformity == ConformityOptions.Strict) || !lessCssMixin))
-                        brokenRules.Add(new OnlyAllowBareSelectorsEncounteredException(selectorFragment));
+                        yield return new OnlyAllowBareSelectorsEncounteredException(selectorFragment);
 				}
 
 				var containerFragment = fragment as ContainerFragment;
                 if (containerFragment != null)
-                    brokenRules = brokenRules.Concat(GetAnyBrokenRules(containerFragment.ChildFragments)).ToList();
+                    foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments))
+                        yield return brokenRule;
 			}
-
-            return brokenRules;
 		}
 
 		public class OnlyAllowBareSelectorsEncounteredException : BrokenRuleEncounteredException

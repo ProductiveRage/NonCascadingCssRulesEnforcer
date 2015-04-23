@@ -49,8 +49,6 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 
         public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
 		{
-            List<BrokenRuleEncounteredException> brokenRules = new List<BrokenRuleEncounteredException>();
-
             if (fragments == null)
 				throw new ArgumentNullException("fragments");
 
@@ -66,13 +64,12 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 					if (!selectorFragment.IsScopeRestrictingHtmlTag() || (_scopeRestrictingHtmlTagBehaviour == ScopeRestrictingHtmlTagBehaviourOptions.Disallow))
 					{
                         if (selectorFragment.Selectors.Any(s => !IsValidSelector(s)))
-                            brokenRules.Add(new DisallowBareSelectorsEncounteredException(selectorFragment));
+                            yield return new DisallowBareSelectorsEncounteredException(selectorFragment);
 					}
 				}
-
-                brokenRules.Concat(GetAnyBrokenRules(containerFragment.ChildFragments)).ToList();
+                foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments))
+                    yield return brokenRule;
 			}
-            return brokenRules;
 		}
 
 		/// <summary>

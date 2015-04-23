@@ -91,8 +91,6 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 
         public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
         {
-            List<BrokenRuleEncounteredException> brokenRules = new List<BrokenRuleEncounteredException>();
-
             if (fragments == null)
                 throw new ArgumentNullException("fragments");
 
@@ -119,14 +117,13 @@ namespace NonCascadingCSSRulesEnforcer.Rules
                     {
 
                         var exception = _exceptionRaiser(containerFragment);
-                         brokenRules.Add(exception as BrokenRuleEncounteredException);   
+                         yield return exception as BrokenRuleEncounteredException;   
                     }
                 }
 
-                brokenRules = brokenRules.Concat(GetAnyBrokenRules(containerFragment.ChildFragments)).ToList();
+                foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments))
+                    yield return brokenRule;
             }
-
-            return brokenRules;
         }
     }
 }

@@ -103,10 +103,8 @@ namespace NonCascadingCSSRulesEnforcer.Rules
             return GetAnyBrokenRules(fragments, new ContainerFragment[0]);
         }
 
-        private List<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments, IEnumerable<ContainerFragment> containers)
+        private IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments, IEnumerable<ContainerFragment> containers)
         {
-            List<BrokenRuleEncounteredException> brokenRules = new List<BrokenRuleEncounteredException>();
-
             if (fragments == null)
                 throw new ArgumentNullException("Fragments");
             if (containers == null)
@@ -120,8 +118,8 @@ namespace NonCascadingCSSRulesEnforcer.Rules
                 var containerFragment = fragment as ContainerFragment;
                 if (containerFragment != null)
                 {
-                    //EnsureRulesAreMet(containerFragment.ChildFragments, containers.Concat(new[] { containerFragment }));
-                    brokenRules = brokenRules.Concat(GetAnyBrokenRules(containerFragment.ChildFragments, containers.Concat(new[] { containerFragment }))).ToList();
+                    foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments, containers.Concat(new[] { containerFragment })))
+                        yield return brokenRule;
                     continue;
                 }
 
@@ -162,7 +160,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
                                 if (IsPercentageMeasurement(value))
                                 {
                                     if (value != "100%")
-                                        brokenRules.Add(new AllMeasurementsMustBePixelsNotAppliedException("The only allow percentage width for img is 100%", fragment));
+                                        yield return new AllMeasurementsMustBePixelsNotAppliedException("The only allow percentage width for img is 100%", fragment);
 
                                     // We only need to ensure that the img is nested within an element with a percentage width, we don't have to worry about ensuring that
                                     // the selector targets div/tds elements only since this is handled by the above check (that percentage-width styles only target divs)
@@ -179,9 +177,9 @@ namespace NonCascadingCSSRulesEnforcer.Rules
                                     if (firstContainerWithPercentageWidth != null)
                                         continue;
 
-                                    brokenRules.Add(new AllMeasurementsMustBePixelsNotAppliedException(
+                                    yield return new AllMeasurementsMustBePixelsNotAppliedException(
                                         "Percentage width for img may is only allowable if nested within a div or td style with percentage width (and the img must have width:100%)",
-                                        fragment));
+                                        fragment);
                                     continue;
                                 }
                             }
@@ -197,8 +195,8 @@ namespace NonCascadingCSSRulesEnforcer.Rules
                         float numericValue;
                         if (float.TryParse(value.Substring(0, value.Length - disallowedMeasurementUnit.Length).Trim(), out numericValue))
                         {
-                            brokenRules.Add(new AllMeasurementsMustBePixelsNotAppliedException(fragment));
-                            return brokenRules;
+                            yield return new AllMeasurementsMustBePixelsNotAppliedException(fragment);
+                            yield break;
                         }
                     }
 
@@ -206,8 +204,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
                     // it's not allowed at this point
                     if (IsPercentageMeasurement(value))
                     {
-                        brokenRules.Add(new AllMeasurementsMustBePixelsNotAppliedException(fragment));
-                        return brokenRules;
+                        yield return new AllMeasurementsMustBePixelsNotAppliedException(fragment);
                     }
                 }
 
@@ -222,11 +219,10 @@ namespace NonCascadingCSSRulesEnforcer.Rules
                         s.Equals("thick", StringComparison.InvariantCultureIgnoreCase)
                     ))
                     {
-                        brokenRules.Add(new AllMeasurementsMustBePixelsNotAppliedException(fragment));
+                        yield return new AllMeasurementsMustBePixelsNotAppliedException(fragment);
                     }
                 }
             }
-            return brokenRules;
         }
 
 		private bool IsPercentageMeasurement(string value)

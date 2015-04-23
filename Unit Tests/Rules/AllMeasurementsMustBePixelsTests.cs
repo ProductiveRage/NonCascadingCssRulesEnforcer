@@ -253,7 +253,8 @@ namespace UnitTests.Rules
                 new object[] {8,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("border", "thick solid black")).ToContainerFragment() ,1},
                 new object[] {9,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("margin", "0 auto")).ToContainerFragment() ,0},
                 new object[] {10,CSSFragmentBuilderSelector.New("p",CSSFragmentBuilderStyleProperty.New("width", "percentage(0.1)")).ToContainerFragment() ,1},
-                new object[] {11,CSSFragmentBuilderSelector.New("a",CSSFragmentBuilderStyleProperty.New("width", "100% !important")).ToContainerFragment() ,1}
+                new object[] {11,CSSFragmentBuilderSelector.New("a",CSSFragmentBuilderStyleProperty.New("width", "100% !important")).ToContainerFragment() ,1},
+                new object[] {12,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("margin", "10pt 10pt 15px 0;")).ToContainerFragment() ,1}
                 };
             }
         }

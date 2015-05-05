@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rules\LegacyIESelectorLimitMustBeRespectedTests.cs" />
     <Compile Include="Rules\OnlyBareSelectorsInResetsAndThemeSheetsTests.cs" />
     <Compile Include="Rules\HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheetsTests.cs" />
     <Compile Include="Rules\AllMeasurementsMustBePixelsTests.cs" />

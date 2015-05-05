@@ -13,7 +13,7 @@
     <AssemblyName>NonCascadingCSSRulesEnforcer.CSSMinifierIntegration</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>e092d08a</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>a1fdf58a</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

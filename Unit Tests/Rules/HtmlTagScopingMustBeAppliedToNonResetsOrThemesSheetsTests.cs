@@ -10,21 +10,18 @@ namespace UnitTests.Rules
 {
 	public class HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheetsTests
     {
-        #region EnsureRulesAreMet
         [Fact]
 		public void EmptyContentIsAcceptable()
 		{
 			var content = new ICSSFragment[0];
-
-				(new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets()).EnsureRulesAreMet(content);
+			(new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets()).EnsureRulesAreMet(content);
 		}
 
 		[Fact]
 		public void HtmlTagWithNoNestedContentIsAcceptable()
 		{
 			var content = CSSFragmentBuilderSelector.New("html").ToContainerFragment();
-
-				(new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets()).EnsureRulesAreMet(new[] { content });
+			(new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets()).EnsureRulesAreMet(new[] { content });
 		}
 
 		[Fact]
@@ -83,9 +80,7 @@ namespace UnitTests.Rules
 				(new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets()).EnsureRulesAreMet(new[] { content });
 			});
 		}
-        #endregion EnsureRulesAreMet
 
-        #region GetAnyBrokenRules
         [Fact]
         public void EmptyContentReturnsNoBrokenRules()
         {
@@ -94,16 +89,14 @@ namespace UnitTests.Rules
             Assert.Empty((new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets()).GetAnyBrokenRules(content));
         }
 
-
         [Theory, MemberData("GetAnyBrokenRulesErrorCountContent")]
         public void GetAnyBrokenRulesErrorCount(int Id, ICSSFragment content, int expectedErrors)
         {
             Assert.Equal(
                 expectedErrors,
                 (new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets()).GetAnyBrokenRules(new[] { content }).Count()
-                );
+            );
         }
-        #endregion GetAnyBrokenRules
 
         public static IEnumerable<object[]> GetAnyBrokenRulesErrorCountContent
         {
@@ -111,11 +104,11 @@ namespace UnitTests.Rules
             {
                 return new[]
                 {
-                new object[] {1,CSSFragmentBuilderSelector.New("html").ToContainerFragment(),0 },
-                new object[] {2,CSSFragmentBuilderSelector.New("html", CSSFragmentBuilderSelector.New("div")).ToContainerFragment(),0},
-                new object[] {3,CSSFragmentBuilderSelector.New("html", CSSFragmentBuilderSelector.New("@media print", CSSFragmentBuilderStyleProperty.New("color", "black"))).ToContainerFragment(),1},
-                new object[] {4,CSSFragmentBuilderSelector.New("html", CSSFragmentBuilderStyleProperty.New("color", "black")).ToContainerFragment(),1},
-                new object[] {5,CSSFragmentBuilderSelector.New("html", CSSFragmentBuilderStyleProperty.New("@backgroundColor", "black"), CSSFragmentBuilderStyleProperty.New("color", "@backgroundColor")).ToContainerFragment(),1}
+                    new object[] {1,CSSFragmentBuilderSelector.New("html").ToContainerFragment(),0 },
+                    new object[] {2,CSSFragmentBuilderSelector.New("html", CSSFragmentBuilderSelector.New("div")).ToContainerFragment(),0},
+                    new object[] {3,CSSFragmentBuilderSelector.New("html", CSSFragmentBuilderSelector.New("@media print", CSSFragmentBuilderStyleProperty.New("color", "black"))).ToContainerFragment(),1},
+                    new object[] {4,CSSFragmentBuilderSelector.New("html", CSSFragmentBuilderStyleProperty.New("color", "black")).ToContainerFragment(),1},
+                    new object[] {5,CSSFragmentBuilderSelector.New("html", CSSFragmentBuilderStyleProperty.New("@backgroundColor", "black"), CSSFragmentBuilderStyleProperty.New("color", "@backgroundColor")).ToContainerFragment(),1}
                 };
             }
         }

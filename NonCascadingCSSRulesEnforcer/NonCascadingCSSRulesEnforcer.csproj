@@ -13,7 +13,7 @@
     <AssemblyName>NonCascadingCSSRulesEnforcer</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>14581aac</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>86c27b6a</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

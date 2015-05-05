@@ -13,14 +13,14 @@ namespace NonCascadingCSSRulesEnforcer.Rules
     public abstract class PropertyMustBeFullySpecifiedIfSpecifiedAtAll : IEnforceRules
     {
         private readonly HashSet<string> _topSideProperties, _leftSideProperties, _bottomSideProperties, _rightSideProperties, _allSidesProperties;
-        private readonly Func<ICSSFragment, Exception> _exceptionRaiser;
+        private readonly Func<ICSSFragment, BrokenRuleEncounteredException> _exceptionRaiser;
         protected PropertyMustBeFullySpecifiedIfSpecifiedAtAll(
             IEnumerable<string> topSideProperties,
             IEnumerable<string> leftSideProperties,
             IEnumerable<string> bottomSideProperties,
             IEnumerable<string> rightSideProperties,
             IEnumerable<string> allSidesProperties,
-            Func<ICSSFragment, Exception> exceptionRaiser)
+            Func<ICSSFragment, BrokenRuleEncounteredException> exceptionRaiser)
         {
             if (topSideProperties == null)
                 throw new ArgumentNullException("topSideProperties");
@@ -116,11 +116,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
                         stylePropertyNames.Any(s => _allSidesProperties.Contains(s)) ||
                         (topSideExplicitlySet && leftSideExplicitlySet && bottomSideExplicitlySet && rightSideExplicitlySet);
                     if (!allSidesSet)
-                    {
-
-                        var exception = _exceptionRaiser(containerFragment);
-                         yield return exception as BrokenRuleEncounteredException;   
-                    }
+                        yield return _exceptionRaiser(containerFragment);
                 }
 
                 foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments))

@@ -39,15 +39,12 @@ namespace NonCascadingCSSRulesEnforcer.Rules.Compatibility
 
         public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
         {
-            return new List<BrokenRuleEncounteredException>();
-
-			/*if (fragments == null)
+			if (fragments == null)
 				throw new ArgumentNullException("fragments");
 
 			var fragmentSet = new CSSFragmentSet(fragments);
 			if (fragmentSet.TotalSelectorCount > MAX_NUMBER_OF_SELECTORS)
-				throw new LegacyIESelectorLimitMustBeRespectedException(fragmentSet);
-            */
+                yield return new LegacyIESelectorLimitMustBeRespectedException(fragmentSet);
 		}
 
 		public class LegacyIESelectorLimitMustBeRespectedException : BrokenRuleEncounteredException

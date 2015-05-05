@@ -23,12 +23,15 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// This will throw an exception if the specified rule BrokenRuleEncounteredException is broken. It will throw an ArgumentException for a null fragments
 		/// references, or one which contains a null reference.
 		/// </summary>
-		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
-		{
-            IEnumerable<BrokenRuleEncounteredException> brokenRules = GetAnyBrokenRules(fragments);
-            if (brokenRules.Any())
-                throw brokenRules.First();
-		}
+        public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
+        {
+            if (fragments == null)
+                throw new ArgumentNullException("fragments");
+
+            var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
+            if (firstBrokenRuleIfAny != null)
+                throw firstBrokenRuleIfAny;
+        }
 
         public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
         {

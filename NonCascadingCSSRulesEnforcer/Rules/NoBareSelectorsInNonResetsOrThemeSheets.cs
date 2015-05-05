@@ -42,9 +42,12 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// </summary>
         public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
         {
-            IEnumerable<BrokenRuleEncounteredException> brokenRules = GetAnyBrokenRules(fragments);
-            if (brokenRules.Any())
-                throw brokenRules.First();
+            if (fragments == null)
+                throw new ArgumentNullException("fragments");
+
+            var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
+            if (firstBrokenRuleIfAny != null)
+                throw firstBrokenRuleIfAny;
         }
 
         public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)

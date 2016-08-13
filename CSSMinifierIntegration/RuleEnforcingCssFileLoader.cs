@@ -10,6 +10,9 @@ using NonCascadingCSSRulesEnforcer.Rules;
 namespace NonCascadingCSSRulesEnforcer.CSSMinifierIntegration
 {
 	/// <summary>
+	/// This class allows the rules validation process to be integrated into the CSS loading that the CSSMinifier performs (see
+	/// https://bitbucket.org/DanRoberts/cssminifier repository).
+	/// 
 	/// This will load content and apply all of the the specified validation rules at the appropriate points (some process individual files,
 	/// some process combined - but not compiled - content and some process combined and compiled content). In order to intercept loading
 	/// at the required points, both a baseContentLoader (that loads individual files without processing) and a compilerGeneraor (that
@@ -22,13 +25,13 @@ namespace NonCascadingCSSRulesEnforcer.CSSMinifierIntegration
 		private readonly StyleSheetTypeDeterminer _styleSheetTypeDeterminer;
 		private readonly ITextFileLoader _baseContentLoader;
 		private readonly CompilerGenerator _compilerGenerator;
-        private readonly Action<BrokenRuleEncounteredInFileException> _optionalBrokenFileCallback;
+		private readonly Action<BrokenRuleEncounteredInFileException> _optionalBrokenFileCallback;
 		public RuleEnforcingCssFileLoader(
 			IEnumerable<IEnforceRules> rules,
 			StyleSheetTypeDeterminer styleSheetTypeDeterminer,
 			ITextFileLoader baseContentLoader,
 			CompilerGenerator compilerGenerator,
-            Action<BrokenRuleEncounteredInFileException> optionalBrokenFileCallback = null)
+			Action<BrokenRuleEncounteredInFileException> optionalBrokenFileCallback = null)
 		{
 			if (rules == null)
 				throw new ArgumentNullException("rules");
@@ -46,7 +49,7 @@ namespace NonCascadingCSSRulesEnforcer.CSSMinifierIntegration
 			_styleSheetTypeDeterminer = styleSheetTypeDeterminer;
 			_baseContentLoader = baseContentLoader;
 			_compilerGenerator = compilerGenerator;
-            _optionalBrokenFileCallback = optionalBrokenFileCallback;
+			_optionalBrokenFileCallback = optionalBrokenFileCallback;
 		}
 
 		/// <summary>
@@ -98,28 +101,28 @@ namespace NonCascadingCSSRulesEnforcer.CSSMinifierIntegration
 						{
 							if (ruleForIndividualFiles.DoesThisRuleApplyTo(styleSheetType))
 							{
-                                // If there's no callback then we're in the "throw as soon as validation rule broken" mode. If there IS a
-                                // callback then we want to gather ALL validation rule breaks and pass them to the caller
-                                if (_optionalBrokenFileCallback == null)
-                                {
-                                    try
-                                    {
-                                        ruleForIndividualFiles.EnsureRulesAreMet(individualContentFragments);
-                                    }
-                                    catch (BrokenRuleEncounteredException e)
-                                    {
-                                        throw new BrokenRuleEncounteredInFileException(e, styleSheetType, content.RelativePath);
-                                    }
-                                }
-                                else
-                                {
-                                    foreach (var brokenRule in ruleForIndividualFiles.GetAnyBrokenRules(individualContentFragments))
-                                    {
-                                        _optionalBrokenFileCallback(
-                                            new BrokenRuleEncounteredInFileException(brokenRule, styleSheetType, content.RelativePath)
-                                        );
-                                    }
-                                }
+								// If there's no callback then we're in the "throw as soon as validation rule broken" mode. If there IS a
+								// callback then we want to gather ALL validation rule breaks and pass them to the caller
+								if (_optionalBrokenFileCallback == null)
+								{
+									try
+									{
+										ruleForIndividualFiles.EnsureRulesAreMet(individualContentFragments);
+									}
+									catch (BrokenRuleEncounteredException e)
+									{
+										throw new BrokenRuleEncounteredInFileException(e, styleSheetType, content.RelativePath);
+									}
+								}
+								else
+								{
+									foreach (var brokenRule in ruleForIndividualFiles.GetAnyBrokenRules(individualContentFragments))
+									{
+										_optionalBrokenFileCallback(
+											new BrokenRuleEncounteredInFileException(brokenRule, styleSheetType, content.RelativePath)
+										);
+									}
+								}
 							}
 						}
 					}
@@ -158,29 +161,29 @@ namespace NonCascadingCSSRulesEnforcer.CSSMinifierIntegration
 				foreach (var ruleForCompiledContent in rulesForCompiledContent)
 				{
 
-                    
-                    // If there's no callback then we're in the "throw as soon as validation rule broken" mode. If there IS a
-                    // callback then we want to gather ALL validation rule breaks and pass them to the caller
-                    if (_optionalBrokenFileCallback == null)
-                    {
-                        try
-                        {
-                            ruleForCompiledContent.EnsureRulesAreMet(compiledContentFragments);
-                        }
-                        catch (BrokenRuleEncounteredException e)
-                        {
-                            throw new BrokenRuleEncounteredInFileException(e, StyleSheetTypeOptions.Combined, relativePath);
-                        }
-                    }
-                    else
-                    {
-                        foreach (var brokenRule in ruleForCompiledContent.GetAnyBrokenRules(compiledContentFragments))
-                        {
-                            _optionalBrokenFileCallback(
-                                new BrokenRuleEncounteredInFileException(brokenRule, StyleSheetTypeOptions.Combined, relativePath)
-                            );
-                        }
-                    }
+					
+					// If there's no callback then we're in the "throw as soon as validation rule broken" mode. If there IS a
+					// callback then we want to gather ALL validation rule breaks and pass them to the caller
+					if (_optionalBrokenFileCallback == null)
+					{
+						try
+						{
+							ruleForCompiledContent.EnsureRulesAreMet(compiledContentFragments);
+						}
+						catch (BrokenRuleEncounteredException e)
+						{
+							throw new BrokenRuleEncounteredInFileException(e, StyleSheetTypeOptions.Combined, relativePath);
+						}
+					}
+					else
+					{
+						foreach (var brokenRule in ruleForCompiledContent.GetAnyBrokenRules(compiledContentFragments))
+						{
+							_optionalBrokenFileCallback(
+								new BrokenRuleEncounteredInFileException(brokenRule, StyleSheetTypeOptions.Combined, relativePath)
+							);
+						}
+					}
 				}
 			}
 
@@ -201,28 +204,28 @@ namespace NonCascadingCSSRulesEnforcer.CSSMinifierIntegration
 					foreach (var ruleForCombinedContent in rulesForCombinedContent)
 					{
  
-                        // If there's no callback then we're in the "throw as soon as validation rule broken" mode. If there IS a
-                        // callback then we want to gather ALL validation rule breaks and pass them to the caller
-                        if (_optionalBrokenFileCallback == null)
-                        {
-                            try
-                            {
-                                ruleForCombinedContent.EnsureRulesAreMet(combinedContentFragments);
-                            }
-                            catch (BrokenRuleEncounteredException e)
-                            {
-                                throw new BrokenRuleEncounteredInFileException(e, StyleSheetTypeOptions.Combined, relativePath);
-                            }
-                        }
-                        else
-                        {
-                            foreach (var brokenRule in ruleForCombinedContent.GetAnyBrokenRules(combinedContentFragments))
-                            {
-                                _optionalBrokenFileCallback(
-                                    new BrokenRuleEncounteredInFileException(brokenRule, StyleSheetTypeOptions.Combined, relativePath)
-                                );
-                            }
-                        }
+						// If there's no callback then we're in the "throw as soon as validation rule broken" mode. If there IS a
+						// callback then we want to gather ALL validation rule breaks and pass them to the caller
+						if (_optionalBrokenFileCallback == null)
+						{
+							try
+							{
+								ruleForCombinedContent.EnsureRulesAreMet(combinedContentFragments);
+							}
+							catch (BrokenRuleEncounteredException e)
+							{
+								throw new BrokenRuleEncounteredInFileException(e, StyleSheetTypeOptions.Combined, relativePath);
+							}
+						}
+						else
+						{
+							foreach (var brokenRule in ruleForCombinedContent.GetAnyBrokenRules(combinedContentFragments))
+							{
+								_optionalBrokenFileCallback(
+									new BrokenRuleEncounteredInFileException(brokenRule, StyleSheetTypeOptions.Combined, relativePath)
+								);
+							}
+						}
 					}
 				}
 			}

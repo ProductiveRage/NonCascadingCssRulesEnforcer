@@ -31,7 +31,8 @@ namespace Tester
 				),
 				new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets(),
 				new BorderAndPaddingMayNotBeCombinedWithWidth(
-					BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.AllowVerticalBorderAndPadding
+					BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.AllowVerticalBorderAndPadding |
+					BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.IgnoreRuleIfBorderBoxSizingRulePresent
 				),
 				new MarginMustBeFullySpecifiedIfSpecifiedAtAll(),
 				new NoBareSelectorsInNonResetsOrThemeSheets(

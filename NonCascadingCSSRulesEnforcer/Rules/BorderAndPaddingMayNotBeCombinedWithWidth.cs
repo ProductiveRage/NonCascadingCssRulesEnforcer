@@ -12,6 +12,18 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 	/// </summary>
 	public class BorderAndPaddingMayNotBeCombinedWithWidth : IEnforceRules
 	{
+		/// <summary>
+		/// The recommended configuration allows vertical border and padding to be combined since vertical layout is often content dependent and so less predictable than
+		/// horizontal layout in the general case, designs are also commonly less specific about the heights of areas of a design (it's important for columns to have the
+		/// desired widths or for items in a gallery to have consistent widths but the heights are more likely to vary depending upon the user content displayed). It will
+		/// also allow border and padding to be combined if the rule set also has box-sizing border box rule set, since this makes the box model much more sane for cases
+		/// where border and padding are used together (the only reason that this option would not be enabled is if very old versions of IE must be supported).
+		/// </summary>
+		public static BorderAndPaddingMayNotBeCombinedWithWidth Recommended => _recommended;
+		private static BorderAndPaddingMayNotBeCombinedWithWidth _recommended = new BorderAndPaddingMayNotBeCombinedWithWidth(
+			ConformityOptions.AllowVerticalBorderAndPadding | ConformityOptions.IgnoreRuleIfBorderBoxSizingRulePresent
+		);
+
 		private readonly ConformityOptions _conformity;
 		public BorderAndPaddingMayNotBeCombinedWithWidth(ConformityOptions conformity)
 		{
@@ -44,18 +56,18 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// This will throw an exception if the specified rule BrokenRuleEncounteredException is broken. It will throw an ArgumentException for a null fragments
 		/// references, or one which contains a null reference.
 		/// </summary>
-        public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
-        {
-            if (fragments == null)
-                throw new ArgumentNullException("fragments");
+		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
+		{
+			if (fragments == null)
+				throw new ArgumentNullException("fragments");
 
-            var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
-            if (firstBrokenRuleIfAny != null)
-                throw firstBrokenRuleIfAny;
-        }
+			var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
+			if (firstBrokenRuleIfAny != null)
+				throw firstBrokenRuleIfAny;
+		}
 
-        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
-        {
+		public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+		{
 			if (fragments == null)
 				throw new ArgumentNullException("fragments");
 
@@ -123,13 +135,13 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 							borderDimensions.PropertyWithNonZeroRightValueIfAny ??
 							((_conformity == ConformityOptions.Strict) ? borderDimensions.PropertyWithNonZeroBottomValueIfAny : null) ??
 							borderDimensions.PropertyWithNonZeroLeftValueIfAny;
-                        if (invalidProperty != null)
-                            yield return new BorderAndPaddingMayNotBeCombinedWithWidthException(invalidProperty);
+						if (invalidProperty != null)
+							yield return new BorderAndPaddingMayNotBeCombinedWithWidthException(invalidProperty);
 					}
 				}
 
-                foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments))
-                    yield return brokenRule;
+				foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments))
+					yield return brokenRule;
 			}
 		}
 

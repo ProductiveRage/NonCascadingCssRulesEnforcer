@@ -24,29 +24,16 @@ namespace Tester
 			// which can go unnoticed for some time and be very annoying once discovered!)
 			var fullSetOfValidationRules = new IEnforceRules[]
 			{
-				new AllMeasurementsMustBePixels(
-					AllMeasurementsMustBePixels.ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty |
-					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
-					new[] { "div", "td", "th", "li" }
-				),
-				new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets(),
-				new BorderAndPaddingMayNotBeCombinedWithWidth(
-					BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.AllowVerticalBorderAndPadding |
-					BorderAndPaddingMayNotBeCombinedWithWidth.ConformityOptions.IgnoreRuleIfBorderBoxSizingRulePresent
-				),
-				new MarginMustBeFullySpecifiedIfSpecifiedAtAll(),
-				new NoBareSelectorsInNonResetsOrThemeSheets(
-					NoBareSelectorsInNonResetsOrThemeSheets.ScopeRestrictingHtmlTagBehaviourOptions.Allow
-				),
-				new NoMediaQueriesInResetsAndThemeSheets(),
-				new NoSelectorMayBeRepeatedInTheRules(
-					NoSelectorMayBeRepeatedInTheRules.ConformityOptions.AllowBareSelectorsToBeRepeated
-				),
-				new OnlyBareSelectorsInResetsAndThemeSheets(
-					OnlyBareSelectorsInResetsAndThemeSheets.ConformityOptions.AllowLessCssMixins
-				),
-				new PaddingMustBeFullySpecifiedIfSpecifiedAtAll(),
-				new LegacyIESelectorLimitMustBeRespected()
+				AllMeasurementsMustBePixels.Recommended,
+				HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets.Instance,
+				BorderAndPaddingMayNotBeCombinedWithWidth.Recommended,
+				MarginMustBeFullySpecifiedIfSpecifiedAtAll.Instance,
+				NoBareSelectorsInNonResetsOrThemeSheets.Recommended,
+				NoMediaQueriesInResetsAndThemeSheets.Instance,
+				NoSelectorMayBeRepeatedInTheRules.Recommended,
+				OnlyBareSelectorsInResetsAndThemeSheets.Recommended,
+				PaddingMustBeFullySpecifiedIfSpecifiedAtAll.Instance,
+				LegacyIESelectorLimitMustBeRespected.Instance
 			};
 
 			// Declare the stylesheet loaded - since this uses the EnhancedNonCachedLessCssLoaderFactory, the @imports will all be flattened and the LESS content processed

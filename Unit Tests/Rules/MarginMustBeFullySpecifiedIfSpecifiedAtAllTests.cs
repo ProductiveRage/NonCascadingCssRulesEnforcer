@@ -1,9 +1,9 @@
-﻿using CSSParser.ExtendedLESSParser.ContentSections;
+﻿using System.Collections.Generic;
+using System.Linq;
+using CSSParser.ExtendedLESSParser.ContentSections;
 using NonCascadingCSSRulesEnforcer.Rules;
-using System.Collections.Generic;
 using UnitTests.Shared;
 using Xunit;
-using System.Linq;
 
 namespace UnitTests.Rules
 {
@@ -14,7 +14,7 @@ namespace UnitTests.Rules
 		{
 			var content = CSSFragmentBuilderSelector.New("div").ToContainerFragment();
 
-				(new MarginMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
+			MarginMustBeFullySpecifiedIfSpecifiedAtAll.Instance.EnsureRulesAreMet(new[] { content });
 		}
 
 		[Fact]
@@ -25,7 +25,7 @@ namespace UnitTests.Rules
 				CSSFragmentBuilderStyleProperty.New("margin", "16px")
 			).ToContainerFragment();
 
-				(new MarginMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
+			MarginMustBeFullySpecifiedIfSpecifiedAtAll.Instance.EnsureRulesAreMet(new[] { content });
 		}
 
 		[Fact]
@@ -39,7 +39,7 @@ namespace UnitTests.Rules
 				CSSFragmentBuilderStyleProperty.New("margin-right", "16px")
 			).ToContainerFragment();
 
-				(new MarginMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
+			MarginMustBeFullySpecifiedIfSpecifiedAtAll.Instance.EnsureRulesAreMet(new[] { content });
 		}
 
 		[Fact]
@@ -51,7 +51,7 @@ namespace UnitTests.Rules
 				CSSFragmentBuilderStyleProperty.New("margin", "16px")
 			).ToContainerFragment();
 
-				(new MarginMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
+			MarginMustBeFullySpecifiedIfSpecifiedAtAll.Instance.EnsureRulesAreMet(new[] { content });
 		}
 
 		[Fact]
@@ -64,32 +64,32 @@ namespace UnitTests.Rules
 
 			Assert.Throws<MarginMustBeFullySpecifiedIfSpecifiedAtAll.MarginMustBeFullySpecifiedIfSpecifiedAtAllException>(() =>
 			{
-				(new MarginMustBeFullySpecifiedIfSpecifiedAtAll()).EnsureRulesAreMet(new[] { content });
+				MarginMustBeFullySpecifiedIfSpecifiedAtAll.Instance.EnsureRulesAreMet(new[] { content });
 			});
 		}
 
-        [Theory, MemberData("GetAnyBrokenRulesContent")]
-        public void GetAnyBrokenRulesCount(int Id, ICSSFragment content, int expectedErrors)
-        {
-            Assert.Equal(
-                expectedErrors,
-                (new MarginMustBeFullySpecifiedIfSpecifiedAtAll()).GetAnyBrokenRules(new[] { content }).Count()
-                );
-        }
+		[Theory, MemberData("GetAnyBrokenRulesContent")]
+		public void GetAnyBrokenRulesCount(int Id, ICSSFragment content, int expectedErrors)
+		{
+			Assert.Equal(
+				expectedErrors,
+				MarginMustBeFullySpecifiedIfSpecifiedAtAll.Instance.GetAnyBrokenRules(new[] { content }).Count()
+			);
+		}
 
-        public static IEnumerable<object[]> GetAnyBrokenRulesContent
-        {
-            get
-            {
-                return new[]
-                {
-                new object[] {1,CSSFragmentBuilderSelector.New("div").ToContainerFragment(),0 },
-                new object[] {2,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("margin", "16px")).ToContainerFragment(),0},
-                new object[] {3,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("margin-top", "16px"),CSSFragmentBuilderStyleProperty.New("margin-left", "16px"),CSSFragmentBuilderStyleProperty.New("margin-bottom", "16px"),CSSFragmentBuilderStyleProperty.New("margin-right", "16px")).ToContainerFragment(),0},
-                new object[] {4,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("margin-top", "8px"),CSSFragmentBuilderStyleProperty.New("margin", "16px")).ToContainerFragment(),0},
-                new object[] {5,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("margin-top", "16px")).ToContainerFragment(),1},
-                };
-            }
-        }
+		public static IEnumerable<object[]> GetAnyBrokenRulesContent
+		{
+			get
+			{
+				return new[]
+				{
+					new object[] {1,CSSFragmentBuilderSelector.New("div").ToContainerFragment(),0 },
+					new object[] {2,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("margin", "16px")).ToContainerFragment(),0},
+					new object[] {3,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("margin-top", "16px"),CSSFragmentBuilderStyleProperty.New("margin-left", "16px"),CSSFragmentBuilderStyleProperty.New("margin-bottom", "16px"),CSSFragmentBuilderStyleProperty.New("margin-right", "16px")).ToContainerFragment(),0},
+					new object[] {4,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("margin-top", "8px"),CSSFragmentBuilderStyleProperty.New("margin", "16px")).ToContainerFragment(),0},
+					new object[] {5,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("margin-top", "16px")).ToContainerFragment(),1},
+				};
+			}
+		}
 	}
 }

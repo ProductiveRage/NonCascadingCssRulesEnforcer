@@ -1,10 +1,9 @@
-﻿using CSSParser.ExtendedLESSParser.ContentSections;
-using NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using CSSParser.ExtendedLESSParser.ContentSections;
+using NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions;
 
 namespace NonCascadingCSSRulesEnforcer.Rules
 {
@@ -13,6 +12,10 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 	/// </summary>
 	public class HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets : IEnforceRules
 	{
+		private static HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets _instance = new HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets();
+		public static HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets  Instance => _instance;
+		private HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets() { }
+
 		public bool DoesThisRuleApplyTo(StyleSheetTypeOptions styleSheetType)
 		{
 			if (!Enum.IsDefined(typeof(StyleSheetTypeOptions), styleSheetType))
@@ -29,34 +32,34 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// </summary>
 		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
 		{
-            if (fragments == null)
-                throw new ArgumentNullException("fragments");
+			if (fragments == null)
+				throw new ArgumentNullException("fragments");
 
-            var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
-            if (firstBrokenRuleIfAny != null)
-                throw firstBrokenRuleIfAny;
-        }
+			var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
+			if (firstBrokenRuleIfAny != null)
+				throw firstBrokenRuleIfAny;
+		}
 
-        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
-        {
-            if (fragments == null)
-                throw new ArgumentNullException("fragments");
+		public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+		{
+			if (fragments == null)
+				throw new ArgumentNullException("fragments");
 
-            var brokenRules = new List<BrokenRuleEncounteredException>();
-            foreach (var fragment in fragments)
-            {
-                if (fragment == null)
-                    throw new ArgumentException("Encountered null fragment - invalid");
+			var brokenRules = new List<BrokenRuleEncounteredException>();
+			foreach (var fragment in fragments)
+			{
+				if (fragment == null)
+					throw new ArgumentException("Encountered null fragment - invalid");
 
-                // Ignore @import statements in non-compiled content
-                if (fragment is Import)
-                    continue;
+				// Ignore @import statements in non-compiled content
+				if (fragment is Import)
+					continue;
 
-                var selectorFragment = fragment as Selector;
-                if ((selectorFragment == null) || !selectorFragment.IsScopeRestrictingHtmlTag())
-                    yield return new ScopeRestrictingHtmlTagNotAppliedException(fragment);
-            }
-        }
+				var selectorFragment = fragment as Selector;
+				if ((selectorFragment == null) || !selectorFragment.IsScopeRestrictingHtmlTag())
+					yield return new ScopeRestrictingHtmlTagNotAppliedException(fragment);
+			}
+		}
 
 		public class ScopeRestrictingHtmlTagNotAppliedException : BrokenRuleEncounteredException
 		{

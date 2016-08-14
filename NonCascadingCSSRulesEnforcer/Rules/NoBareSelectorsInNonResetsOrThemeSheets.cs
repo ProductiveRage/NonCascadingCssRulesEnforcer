@@ -12,6 +12,15 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 	/// </summary>
 	public class NoBareSelectorsInNonResetsOrThemeSheets : IEnforceRules
 	{
+		/// <summary>
+		/// The recommended configuration for this rule is to allow a bare html tag to be use in non-Resets-or-Themes style sheets (this rule doesn't apply to Resets or Themes
+		/// sheets) so long as the html tag is the outer most tag and does not directly contain any rules - in other words, if it a scope-restricting-html-tag as tested for by
+		/// the HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets rule. If the recommendation to use a scope-restricting-html-tag is not part of the guidelines being tested
+		/// for then a NoBareSelectorsInNonResetsOrThemeSheets instance with ScopeRestrictingHtmlTagBehaviourOptions.Disallow should be used.
+		/// </summary>
+		public static NoBareSelectorsInNonResetsOrThemeSheets Recommended => _recommended;
+		private static NoBareSelectorsInNonResetsOrThemeSheets _recommended = new NoBareSelectorsInNonResetsOrThemeSheets(ScopeRestrictingHtmlTagBehaviourOptions.Allow);
+
 		private readonly ScopeRestrictingHtmlTagBehaviourOptions _scopeRestrictingHtmlTagBehaviour;
 		public NoBareSelectorsInNonResetsOrThemeSheets(ScopeRestrictingHtmlTagBehaviourOptions scopeRestrictingHtmlTagBehaviour)
 		{
@@ -40,19 +49,19 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// This will throw an exception if the specified rule BrokenRuleEncounteredException is broken. It will throw an ArgumentException for a null fragments
 		/// references, or one which contains a null reference.
 		/// </summary>
-        public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
-        {
-            if (fragments == null)
-                throw new ArgumentNullException("fragments");
-
-            var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
-            if (firstBrokenRuleIfAny != null)
-                throw firstBrokenRuleIfAny;
-        }
-
-        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
 		{
-            if (fragments == null)
+			if (fragments == null)
+				throw new ArgumentNullException("fragments");
+
+			var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
+			if (firstBrokenRuleIfAny != null)
+				throw firstBrokenRuleIfAny;
+		}
+
+		public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+		{
+			if (fragments == null)
 				throw new ArgumentNullException("fragments");
 
 			foreach (var fragment in fragments)
@@ -66,12 +75,12 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				{
 					if (!selectorFragment.IsScopeRestrictingHtmlTag() || (_scopeRestrictingHtmlTagBehaviour == ScopeRestrictingHtmlTagBehaviourOptions.Disallow))
 					{
-                        if (selectorFragment.Selectors.Any(s => !IsValidSelector(s)))
-                            yield return new DisallowBareSelectorsEncounteredException(selectorFragment);
+						if (selectorFragment.Selectors.Any(s => !IsValidSelector(s)))
+							yield return new DisallowBareSelectorsEncounteredException(selectorFragment);
 					}
 				}
-                foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments))
-                    yield return brokenRule;
+				foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments))
+					yield return brokenRule;
 			}
 		}
 
@@ -87,11 +96,11 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			// - We'll have to do a single replace-double-space-with-single-space in case we introduced a double space between a selector and a following
 			//   child selector symbol (eg. "div.Wrapper > h2" to "div.Wrapper  >h2") but that's the only whitespace concern since the whitespace has
 			//   already been normalised (as it's a WhiteSpaceNormalisedString!)
-            foreach (var cssSelectorSegment in cssSelector.Value.Replace("> ", ">").Replace(">", " >").Replace("  ", " ").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
+			foreach (var cssSelectorSegment in cssSelector.Value.Replace("> ", ">").Replace(">", " >").Replace("  ", " ").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
 			{
 				// If the segment has a child selector symbol (">"), parent selector symbol ("&") or contains a class or an id then it's ok, if none of
 				// these conditions are met then the selector must be considered invalid (it is a bare selector)
-                if (!cssSelectorSegment.StartsWith(">") && !cssSelectorSegment.StartsWith("&") && !cssSelectorSegment.Contains(".") && !cssSelectorSegment.Contains("#"))
+				if (!cssSelectorSegment.StartsWith(">") && !cssSelectorSegment.StartsWith("&") && !cssSelectorSegment.Contains(".") && !cssSelectorSegment.Contains("#"))
 					return false;
 			}
 			return true;

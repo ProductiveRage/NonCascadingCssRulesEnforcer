@@ -12,6 +12,14 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 	/// </summary>
 	public class OnlyBareSelectorsInResetsAndThemeSheets : IEnforceRules
 	{
+		/// <summary>
+		/// The recommended configuration for this rule is to also allow LESS mixins to appear in Resets and Themes sheets, as well as simple bare selectors - these mixins
+		/// will be available to all other style sheets, unlike any mixins specified in non-Resets-or-Themes sheets for cases where the validation rule enforced by the
+		/// HtmlTagScopingMustBeAppliedToNonResetsOrThemesSheets class is being applied.
+		/// </summary>
+		public static OnlyBareSelectorsInResetsAndThemeSheets Recommended => _recommended;
+		private static OnlyBareSelectorsInResetsAndThemeSheets _recommended = new OnlyBareSelectorsInResetsAndThemeSheets(ConformityOptions.AllowLessCssMixins);
+
 		private readonly ConformityOptions _conformity;
 		public OnlyBareSelectorsInResetsAndThemeSheets(ConformityOptions conformity)
 		{
@@ -44,19 +52,19 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// This will throw an exception if the specified rule BrokenRuleEncounteredException is broken. It will throw an ArgumentException for a null fragments
 		/// references, or one which contains a null reference.
 		/// </summary>
-        public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
-        {
-            if (fragments == null)
-                throw new ArgumentNullException("fragments");
-
-            var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
-            if (firstBrokenRuleIfAny != null)
-                throw firstBrokenRuleIfAny;
-        }
-
-        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
 		{
-            if (fragments == null)
+			if (fragments == null)
+				throw new ArgumentNullException("fragments");
+
+			var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
+			if (firstBrokenRuleIfAny != null)
+				throw firstBrokenRuleIfAny;
+		}
+
+		public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+		{
+			if (fragments == null)
 				throw new ArgumentNullException("fragments");
 
 			foreach (var fragment in fragments)
@@ -67,14 +75,14 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 					// Mixin should contain brackets (eg. ".RounderBorders (@radius)" or ".RounderBorders ()"), while they are valid without the brackets
 					// there is no way to distinguish them from class-based selectors so we can't support their detection here
 					var lessCssMixin = selectorFragment.Selectors.First().Value.Contains("(");
-                    if (!selectorFragment.IsBareSelector() && ((_conformity == ConformityOptions.Strict) || !lessCssMixin))
-                        yield return new OnlyAllowBareSelectorsEncounteredException(selectorFragment);
+					if (!selectorFragment.IsBareSelector() && ((_conformity == ConformityOptions.Strict) || !lessCssMixin))
+						yield return new OnlyAllowBareSelectorsEncounteredException(selectorFragment);
 				}
 
 				var containerFragment = fragment as ContainerFragment;
-                if (containerFragment != null)
-                    foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments))
-                        yield return brokenRule;
+				if (containerFragment != null)
+					foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments))
+						yield return brokenRule;
 			}
 		}
 

@@ -11,6 +11,10 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 	/// </summary>
 	public class NoMediaQueriesInResetsAndThemeSheets : IEnforceRules
 	{
+		private static NoMediaQueriesInResetsAndThemeSheets _instance = new NoMediaQueriesInResetsAndThemeSheets();
+		public static NoMediaQueriesInResetsAndThemeSheets Instance => _instance;
+		private NoMediaQueriesInResetsAndThemeSheets() { }
+
 		public bool DoesThisRuleApplyTo(StyleSheetTypeOptions styleSheetType)
 		{
 			if (!Enum.IsDefined(typeof(StyleSheetTypeOptions), styleSheetType))
@@ -23,33 +27,33 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// This will throw an exception if the specified rule BrokenRuleEncounteredException is broken. It will throw an ArgumentException for a null fragments
 		/// references, or one which contains a null reference.
 		/// </summary>
-        public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
-        {
-            if (fragments == null)
-                throw new ArgumentNullException("fragments");
+		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
+		{
+			if (fragments == null)
+				throw new ArgumentNullException("fragments");
 
-            var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
-            if (firstBrokenRuleIfAny != null)
-                throw firstBrokenRuleIfAny;
-        }
+			var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
+			if (firstBrokenRuleIfAny != null)
+				throw firstBrokenRuleIfAny;
+		}
 
-        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
-        {
-            if (fragments == null)
-                throw new ArgumentNullException("fragments");
+		public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+		{
+			if (fragments == null)
+				throw new ArgumentNullException("fragments");
 
-            foreach (var fragment in fragments)
-            {
-                var mediaQueryFragment = fragment as MediaQuery;
-                if (mediaQueryFragment != null)
-                    yield return new NoMediaQueriesAllowedException(mediaQueryFragment);
+			foreach (var fragment in fragments)
+			{
+				var mediaQueryFragment = fragment as MediaQuery;
+				if (mediaQueryFragment != null)
+					yield return new NoMediaQueriesAllowedException(mediaQueryFragment);
 
-                var containerFragment = fragment as ContainerFragment;
-                if (containerFragment != null)
-                    foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments))
-                        yield return brokenRule;
-            }
-        }
+				var containerFragment = fragment as ContainerFragment;
+				if (containerFragment != null)
+					foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments))
+						yield return brokenRule;
+			}
+		}
 
 		public class NoMediaQueriesAllowedException : BrokenRuleEncounteredException
 		{

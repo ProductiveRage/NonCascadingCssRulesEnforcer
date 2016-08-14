@@ -1,6 +1,6 @@
 # The Non-Cascading-CSS Rules Enforcer
 
-In my blog post "[Non-cascading CSS: A revolution!](http://www.productiverage.com/noncascading-css-a-revolution)", I discussed a set of guidelines that were intended to make it easier to write maintainable style sheets for large projects (utilising the [LESS pre-processor](http://lesscss.org/)). It was inspired by the articles [www.lispcast.com/cascading-separation-abstraction](www.lispcast.com/cascading-separation-abstraction) and [37signals.com/svn/posts/3003-css-taking-control-of-the-cascade](37signals.com/svn/posts/3003-css-taking-control-of-the-cascade) and recommended the following rules:
+In my blog post "[Non-cascading CSS: A revolution!](http://www.productiverage.com/noncascading-css-a-revolution)", I discussed a set of guidelines that were intended to make it easier to write maintainable style sheets for large projects (utilising the [LESS pre-processor](http://lesscss.org/)). It was inspired by the articles [www.lispcast.com/cascading-separation-abstraction](http://www.lispcast.com/cascading-separation-abstraction) and [37signals.com/svn/posts/3003-css-taking-control-of-the-cascade](https://signalvnoise.com/posts/3003-css-taking-control-of-the-cascade) and recommended the following rules:
 
 1. A standard (html5-element-supporting) reset sheet is compulsory, only bare selectors may be specified in it
 1. A single "common" or "theme" sheet will be included with a minimum of default styles, only bare selectors may be specified in it

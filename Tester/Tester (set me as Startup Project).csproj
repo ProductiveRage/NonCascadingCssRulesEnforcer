@@ -94,7 +94,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="PrintOverrides.css" />
     <Content Include="BlogStyles\Resets.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

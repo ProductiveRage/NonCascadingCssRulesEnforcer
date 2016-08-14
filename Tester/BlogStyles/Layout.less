@@ -1,5 +1,14 @@
 html
 {
+	// This rule was previously part of the body ruleset in Theme.less but that broke the validation rule about not including media queries in Resets of Themes sheets,
+	// since they should only be used for layout (which does not belong in Resets or Themes). In this case, it was more about using a larger font size on mobile devices
+	// to appease Google's "Mobile Friendly" analysis and so arguably it IS part of the theme of the site.. but the rule about not having media queries in Resets or
+    // Themes sheets is otherwise a good one, so we'll rely on a workaround - we can't target "body" in a non-Resets-or-Themes sheet since it's too vague, but we
+    // CAN target "> body" since that is much more specific.
+	> body {
+		@media screen and (max-width: 35em) { font-size: 20px; }
+	}
+
 	div.Header
 	{
 		margin: 0 auto 16px auto;

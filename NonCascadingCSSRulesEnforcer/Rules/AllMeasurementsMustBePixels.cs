@@ -12,12 +12,24 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 	/// in styles for elements. This rule can be relaxed to allow certain elements that have percentage widths specified and for any images whose styles are nested within styles
 	/// for those elements to have width 100%.
 	/// If it is relaxed then it is recommended that only div, th and td elements are allowed percentage width. The first because a div element may be a container element used
-	/// for layout (in HTML5 divs are still appropriate as containers if no semantic meaning is attached -see http://webdesign.about.com/od/html5tags/a/when-to-use-section-element.htm)
+	/// for layout (in HTML5 divs are still appropriate as containers if no semantic meaning is attached - see http://webdesign.about.com/od/html5tags/a/when-to-use-section-element.htm)
 	/// while table cell elements do not abide by the same rules for layout that other elements do, it's valid to arrange the columns and fit the data around that rather than trying
 	/// to fit layout around content. Also see http://www.productiverage.com/Read/46 for more justification of the relaxation of this rule.
 	/// </summary>
 	public class AllMeasurementsMustBePixels : IEnforceRules
 	{
+		/// <summary>
+		/// The recommended configuration allows percentage widths on div, th, td and li elements since it's common to use them for layout - for your own use you may wish to be
+		/// stricter or more relaxed (allow percentage widths on fewer or more elements). Using only pixel widths makes everything much more predictable but there are some layout
+		/// elements which require percentage widths in order to be responsive (such as a horizontal gallery displaying four items at any one time). It also allows any element to
+		/// have width 100% specified since that doesn't sacrifice any predictability.
+		/// </summary>
+		public static AllMeasurementsMustBePixels Recommended => _recommended;
+		private static AllMeasurementsMustBePixels _recommended = new AllMeasurementsMustBePixels(
+			ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty | ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
+			new[] { "div", "td", "th", "li" }
+		);
+
 		private readonly ConformityOptions _conformity;
 		private readonly IEnumerable<string> _percentageWidthElementTypesIfEnabled;
 		public AllMeasurementsMustBePixels(ConformityOptions conformity, IEnumerable<string> percentageWidthElementTypesIfEnabled)
@@ -59,7 +71,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 
 			// This can't be applied to compiled stylesheets as the ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypesntageWidthDivs option specifies that img elements
 			// are allowed width:100% if the style is nested within a div that has percentage width (when the rules are compiled or combined this nesting will no longer be possible)
-            return (styleSheetType != StyleSheetTypeOptions.Compiled && styleSheetType != StyleSheetTypeOptions.Combined);
+			return (styleSheetType != StyleSheetTypeOptions.Compiled && styleSheetType != StyleSheetTypeOptions.Combined);
 		}
 
 		[Flags]
@@ -86,147 +98,147 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// This will throw an exception if the specified rule BrokenRuleEncounteredException is broken. It will throw an ArgumentException for a null fragments
 		/// references, or one which contains a null reference.
 		/// </summary>
-        public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
-        {
-            if (fragments == null)
-                throw new ArgumentNullException("fragments");
+		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
+		{
+			if (fragments == null)
+				throw new ArgumentNullException("fragments");
 
-            var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
-            if (firstBrokenRuleIfAny != null)
-                throw firstBrokenRuleIfAny;
-        }
+			var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
+			if (firstBrokenRuleIfAny != null)
+				throw firstBrokenRuleIfAny;
+		}
 
-        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
-        {
-            IEnumerable<BrokenRuleEncounteredException> brokenRules = new List<BrokenRuleEncounteredException>();
+		public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+		{
+			IEnumerable<BrokenRuleEncounteredException> brokenRules = new List<BrokenRuleEncounteredException>();
 
-            if (fragments == null)
-                throw new ArgumentNullException("Fragments");
+			if (fragments == null)
+				throw new ArgumentNullException("Fragments");
 
-            return GetAnyBrokenRules(fragments, new ContainerFragment[0]);
-        }
+			return GetAnyBrokenRules(fragments, new ContainerFragment[0]);
+		}
 
-        private IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments, IEnumerable<ContainerFragment> containers)
-        {
-            if (fragments == null)
-                throw new ArgumentNullException("Fragments");
-            if (containers == null)
-                throw new ArgumentNullException("Fontainers");
+		private IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments, IEnumerable<ContainerFragment> containers)
+		{
+			if (fragments == null)
+				throw new ArgumentNullException("Fragments");
+			if (containers == null)
+				throw new ArgumentNullException("Fontainers");
 
-            foreach (var fragment in fragments)
-            {
-                if (fragment == null)
-                    throw new ArgumentException("Null reference encountered in fragments set");
+			foreach (var fragment in fragments)
+			{
+				if (fragment == null)
+					throw new ArgumentException("Null reference encountered in fragments set");
 
-                var containerFragment = fragment as ContainerFragment;
-                if (containerFragment != null)
-                {
-                    foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments, containers.Concat(new[] { containerFragment })))
-                        yield return brokenRule;
-                    continue;
-                }
+				var containerFragment = fragment as ContainerFragment;
+				if (containerFragment != null)
+				{
+					foreach (var brokenRule in GetAnyBrokenRules(containerFragment.ChildFragments, containers.Concat(new[] { containerFragment })))
+						yield return brokenRule;
+					continue;
+				}
 
-                var stylePropertyValueFragment = fragment as StylePropertyValue;
-                if (stylePropertyValueFragment == null)
-                    continue;
+				var stylePropertyValueFragment = fragment as StylePropertyValue;
+				if (stylePropertyValueFragment == null)
+					continue;
 
-                // Generic tests for measurement units
-                var stylePropertyValueFragmentSections = stylePropertyValueFragment.ValueSegments;
-                if ((_conformity & ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty) == ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty)
-                {
-                    var stylePropertyValueFragmentCombinedSegments = string.Join(" ", stylePropertyValueFragment.ValueSegments);
-                    if ((stylePropertyValueFragmentCombinedSegments == "100%")
-                    || stylePropertyValueFragmentCombinedSegments.Equals("100% !important", StringComparison.OrdinalIgnoreCase))
-                        continue;
-                }
-                foreach (var value in stylePropertyValueFragmentSections)
-                {
-                    if ((_conformity & ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes) == ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes)
-                    {
-                        // To get the parent Selector we have to walk backwards up the containers set since this property value could be wrapped in a MediaQuery - eg.
-                        // div.Whatever {
-                        //   @media screen and (max-width:70em) {
-                        //     width: 50%;
-                        //   }
-                        // }
-                        var directParentSelector = containers.LastOrDefault(c => c is Selector) as Selector;
-                        if ((directParentSelector != null) && stylePropertyValueFragment.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase) && IsPercentageMeasurement(value))
-                        {
-                            // If the selector for this property targets divs or tds only (eg. "div.Main" or "div.Header div.Logo, div.Footer div.Logo") then allow
-                            // percentage widths
-                            if (DoesSelectorTargetOnlyElementsWithTagNames(directParentSelector, _percentageWidthElementTypesIfEnabled))
-                                continue;
+				// Generic tests for measurement units
+				var stylePropertyValueFragmentSections = stylePropertyValueFragment.ValueSegments;
+				if ((_conformity & ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty) == ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty)
+				{
+					var stylePropertyValueFragmentCombinedSegments = string.Join(" ", stylePropertyValueFragment.ValueSegments);
+					if ((stylePropertyValueFragmentCombinedSegments == "100%")
+					|| stylePropertyValueFragmentCombinedSegments.Equals("100% !important", StringComparison.OrdinalIgnoreCase))
+						continue;
+				}
+				foreach (var value in stylePropertyValueFragmentSections)
+				{
+					if ((_conformity & ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes) == ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes)
+					{
+						// To get the parent Selector we have to walk backwards up the containers set since this property value could be wrapped in a MediaQuery - eg.
+						// div.Whatever {
+						//   @media screen and (max-width:70em) {
+						//     width: 50%;
+						//   }
+						// }
+						var directParentSelector = containers.LastOrDefault(c => c is Selector) as Selector;
+						if ((directParentSelector != null) && stylePropertyValueFragment.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase) && IsPercentageMeasurement(value))
+						{
+							// If the selector for this property targets divs or tds only (eg. "div.Main" or "div.Header div.Logo, div.Footer div.Logo") then allow
+							// percentage widths
+							if (DoesSelectorTargetOnlyElementsWithTagNames(directParentSelector, _percentageWidthElementTypesIfEnabled))
+								continue;
 
-                            // If the selector for this property targets imgs only then allow "width:100%" values so long as they are inside a div or td with a percentage width
-                            if (DoesSelectorTargetOnlyElementsWithTagNames(directParentSelector, new[] { "img" }))
-                            {
-                                if (IsPercentageMeasurement(value))
-                                {
-                                    if (value != "100%")
-                                        yield return new AllMeasurementsMustBePixelsNotAppliedException("The only allow percentage width for img is 100%", fragment);
+							// If the selector for this property targets imgs only then allow "width:100%" values so long as they are inside a div or td with a percentage width
+							if (DoesSelectorTargetOnlyElementsWithTagNames(directParentSelector, new[] { "img" }))
+							{
+								if (IsPercentageMeasurement(value))
+								{
+									if (value != "100%")
+										yield return new AllMeasurementsMustBePixelsNotAppliedException("The only allow percentage width for img is 100%", fragment);
 
-                                    // We only need to ensure that the img is nested within an element with a percentage width, we don't have to worry about ensuring that
-                                    // the selector targets div/tds elements only since this is handled by the above check (that percentage-width styles only target divs)
-                                    // - Technically this would allow "div.Content { width: 50%; img { width: 100%; img { width: 100%; } } }" but that's not an error case
-                                    //   since the img tags are still 100% and inside a div with percentage width (it's probably not valid for img tags to be nested but
-                                    //   that's not a concern for this class)
-                                    var firstContainerWithPercentageWidth = containers
-                                        .TakeWhile(c => c != directParentSelector)
-                                        .SelectMany(s => s.ChildFragments)
-                                        .Where(f => f is StylePropertyValue)
-                                        .Cast<StylePropertyValue>()
-                                        .Where(s => s.Property.HasName("width") && s.GetValueSectionsThatAreMeasurements().All(v => v.Unit == "%"))
-                                        .FirstOrDefault();
-                                    if (firstContainerWithPercentageWidth != null)
-                                        continue;
+									// We only need to ensure that the img is nested within an element with a percentage width, we don't have to worry about ensuring that
+									// the selector targets div/tds elements only since this is handled by the above check (that percentage-width styles only target divs)
+									// - Technically this would allow "div.Content { width: 50%; img { width: 100%; img { width: 100%; } } }" but that's not an error case
+									//   since the img tags are still 100% and inside a div with percentage width (it's probably not valid for img tags to be nested but
+									//   that's not a concern for this class)
+									var firstContainerWithPercentageWidth = containers
+										.TakeWhile(c => c != directParentSelector)
+										.SelectMany(s => s.ChildFragments)
+										.Where(f => f is StylePropertyValue)
+										.Cast<StylePropertyValue>()
+										.Where(s => s.Property.HasName("width") && s.GetValueSectionsThatAreMeasurements().All(v => v.Unit == "%"))
+										.FirstOrDefault();
+									if (firstContainerWithPercentageWidth != null)
+										continue;
 
-                                    yield return new AllMeasurementsMustBePixelsNotAppliedException(
-                                        "Percentage width for img may is only allowable if nested within a div or td style with percentage width (and the img must have width:100%)",
-                                        fragment);
-                                    continue;
-                                }
-                            }
-                        }
-                    }
+									yield return new AllMeasurementsMustBePixelsNotAppliedException(
+										"Percentage width for img may is only allowable if nested within a div or td style with percentage width (and the img must have width:100%)",
+										fragment);
+									continue;
+								}
+							}
+						}
+					}
 
-                    // Check for measurements that are a numeric value and a unit string, where the unit string is any other than "px"
-                    foreach (var disallowedMeasurementUnit in DisallowedMeasurementUnits)
-                    {
-                        if (!value.EndsWith(disallowedMeasurementUnit, StringComparison.InvariantCultureIgnoreCase))
-                            continue;
+					// Check for measurements that are a numeric value and a unit string, where the unit string is any other than "px"
+					foreach (var disallowedMeasurementUnit in DisallowedMeasurementUnits)
+					{
+						if (!value.EndsWith(disallowedMeasurementUnit, StringComparison.InvariantCultureIgnoreCase))
+							continue;
 
-                        float numericValue;
-                        if (float.TryParse(value.Substring(0, value.Length - disallowedMeasurementUnit.Length).Trim(), out numericValue))
-                        {
-                            yield return new AllMeasurementsMustBePixelsNotAppliedException(fragment);
-                            yield break;
-                        }
-                    }
+						float numericValue;
+						if (float.TryParse(value.Substring(0, value.Length - disallowedMeasurementUnit.Length).Trim(), out numericValue))
+						{
+							yield return new AllMeasurementsMustBePixelsNotAppliedException(fragment);
+							yield break;
+						}
+					}
 
-                    // If the measurement is a percentage that wasn't caught above then either it's not valid or it uses the "percentage(0.1)" format, either way
-                    // it's not allowed at this point
-                    if (IsPercentageMeasurement(value))
-                    {
-                        yield return new AllMeasurementsMustBePixelsNotAppliedException(fragment);
-                    }
-                }
+					// If the measurement is a percentage that wasn't caught above then either it's not valid or it uses the "percentage(0.1)" format, either way
+					// it's not allowed at this point
+					if (IsPercentageMeasurement(value))
+					{
+						yield return new AllMeasurementsMustBePixelsNotAppliedException(fragment);
+					}
+				}
 
-                // Specific tests for disallowed measurement types
-                // - Border widths must be explicitly specified, use of "thin", "medium" or "thick" are not allowed
-                var stylePropertyNameValue = stylePropertyValueFragment.Property.Value.ToLower();
-                if ((stylePropertyNameValue == "border") || stylePropertyNameValue.StartsWith("border-"))
-                {
-                    if (stylePropertyValueFragmentSections.Any(s =>
-                        s.Equals("thin", StringComparison.InvariantCultureIgnoreCase) ||
-                        s.Equals("medium", StringComparison.InvariantCultureIgnoreCase) ||
-                        s.Equals("thick", StringComparison.InvariantCultureIgnoreCase)
-                    ))
-                    {
-                        yield return new AllMeasurementsMustBePixelsNotAppliedException(fragment);
-                    }
-                }
-            }
-        }
+				// Specific tests for disallowed measurement types
+				// - Border widths must be explicitly specified, use of "thin", "medium" or "thick" are not allowed
+				var stylePropertyNameValue = stylePropertyValueFragment.Property.Value.ToLower();
+				if ((stylePropertyNameValue == "border") || stylePropertyNameValue.StartsWith("border-"))
+				{
+					if (stylePropertyValueFragmentSections.Any(s =>
+						s.Equals("thin", StringComparison.InvariantCultureIgnoreCase) ||
+						s.Equals("medium", StringComparison.InvariantCultureIgnoreCase) ||
+						s.Equals("thick", StringComparison.InvariantCultureIgnoreCase)
+					))
+					{
+						yield return new AllMeasurementsMustBePixelsNotAppliedException(fragment);
+					}
+				}
+			}
+		}
 
 		private bool IsPercentageMeasurement(string value)
 		{

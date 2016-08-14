@@ -15,6 +15,15 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 	/// </summary>
 	public class NoSelectorMayBeRepeatedInTheRules : IEnforceRules
 	{
+		/// <summary>
+		/// The recommended configuration allows for selectors that specify base selectors to be repeated, since this will often happen for the default styling applied
+		/// to basic elements in the Resets and then Themes sheets. Ordinarily, selectors should not appear multiple times since it is ideal for all of the rules that
+		/// will apply to a single element to appear in one place, which may not happen if there are multiple selectors throughout the sheet for the same element; but
+		/// the bare selectors in Resets and Themes sheets are special cases.
+		/// </summary>
+		public static NoSelectorMayBeRepeatedInTheRules Recommended => _recommended;
+		private static NoSelectorMayBeRepeatedInTheRules _recommended = new NoSelectorMayBeRepeatedInTheRules(ConformityOptions.AllowBareSelectorsToBeRepeated);
+
 		private readonly ConformityOptions _conformity;
 		public NoSelectorMayBeRepeatedInTheRules(ConformityOptions conformity)
 		{
@@ -69,38 +78,38 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// This will throw an exception if the specified rule BrokenRuleEncounteredException is broken. It will throw an ArgumentException for a null fragments
 		/// references, or one which contains a null reference.
 		/// </summary>
-        public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
-        {
-            if (fragments == null)
-                throw new ArgumentNullException("fragments");
+		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
+		{
+			if (fragments == null)
+				throw new ArgumentNullException("fragments");
 
-            var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
-            if (firstBrokenRuleIfAny != null)
-                throw firstBrokenRuleIfAny;
-        }
+			var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
+			if (firstBrokenRuleIfAny != null)
+				throw firstBrokenRuleIfAny;
+		}
 
-        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
-        {
-            if (fragments == null)
-                throw new ArgumentNullException("fragments");
+		public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+		{
+			if (fragments == null)
+				throw new ArgumentNullException("fragments");
 
-            // TODO: (Optionally?) allow mixins to be repeated(?)
+			// TODO: (Optionally?) allow mixins to be repeated(?)
 
-            var allSelectors = GetAllSelectors(fragments, new ContainerFragment.SelectorSet[0]);
-            if (_conformity == ConformityOptions.AllowBareSelectorsToBeRepeated)
-                allSelectors = allSelectors.Where(s => !s.Selector.OnlyTargetsBareSelectors());
+			var allSelectors = GetAllSelectors(fragments, new ContainerFragment.SelectorSet[0]);
+			if (_conformity == ConformityOptions.AllowBareSelectorsToBeRepeated)
+				allSelectors = allSelectors.Where(s => !s.Selector.OnlyTargetsBareSelectors());
 
-            var usedSelectorLookup = new Dictionary<string, ICSSFragment>();
-            foreach (var selector in allSelectors.Select(s => new { Source = s.Source, Value = string.Join(" ", s.Selector.Select(v => v.Value)) }))
-            {
-                if (usedSelectorLookup.ContainsKey(selector.Value))
-                {
-                    yield return new NoSelectorMayBeRepeatedInTheRulesException(usedSelectorLookup[selector.Value], selector.Value);
-                    continue;
-                }
-                usedSelectorLookup.Add(selector.Value, selector.Source);
-            }
-        }
+			var usedSelectorLookup = new Dictionary<string, ICSSFragment>();
+			foreach (var selector in allSelectors.Select(s => new { Source = s.Source, Value = string.Join(" ", s.Selector.Select(v => v.Value)) }))
+			{
+				if (usedSelectorLookup.ContainsKey(selector.Value))
+				{
+					yield return new NoSelectorMayBeRepeatedInTheRulesException(usedSelectorLookup[selector.Value], selector.Value);
+					continue;
+				}
+				usedSelectorLookup.Add(selector.Value, selector.Source);
+			}
+		}
 
 		private IEnumerable<SelectorSetWithSourceFragment> GetAllSelectors(IEnumerable<ICSSFragment> fragments, IEnumerable<ContainerFragment.SelectorSet> parentSelectors)
 		{

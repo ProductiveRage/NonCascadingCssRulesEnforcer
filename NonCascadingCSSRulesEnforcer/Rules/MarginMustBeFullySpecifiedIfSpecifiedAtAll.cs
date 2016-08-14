@@ -9,7 +9,9 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 	/// </summary>
 	public class MarginMustBeFullySpecifiedIfSpecifiedAtAll : PropertyMustBeFullySpecifiedIfSpecifiedAtAll
 	{
-		public MarginMustBeFullySpecifiedIfSpecifiedAtAll()
+		private static MarginMustBeFullySpecifiedIfSpecifiedAtAll _instance = new MarginMustBeFullySpecifiedIfSpecifiedAtAll();
+		public static MarginMustBeFullySpecifiedIfSpecifiedAtAll Instance => _instance;
+		private MarginMustBeFullySpecifiedIfSpecifiedAtAll()
 			: base(
 				new[] { "margin-top" },
 				new[] { "margin-left" },
@@ -18,7 +20,6 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				new[] { "margin" },
 				fragment => new MarginMustBeFullySpecifiedIfSpecifiedAtAllException(fragment)
 			) { }
-			
 
 		public class MarginMustBeFullySpecifiedIfSpecifiedAtAllException : BrokenRuleEncounteredException
 		{

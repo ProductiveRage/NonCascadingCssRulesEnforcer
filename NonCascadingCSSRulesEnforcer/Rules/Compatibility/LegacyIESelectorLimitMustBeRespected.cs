@@ -13,6 +13,10 @@ namespace NonCascadingCSSRulesEnforcer.Rules.Compatibility
 	/// </summary>
 	public class LegacyIESelectorLimitMustBeRespected : IEnforceRules
 	{
+		private static LegacyIESelectorLimitMustBeRespected _instance = new LegacyIESelectorLimitMustBeRespected();
+		public static LegacyIESelectorLimitMustBeRespected Instance => _instance;
+		private LegacyIESelectorLimitMustBeRespected() { }
+
 		private const int MAX_NUMBER_OF_SELECTORS = 4095;
 
 		public bool DoesThisRuleApplyTo(StyleSheetTypeOptions styleSheetType)
@@ -27,24 +31,24 @@ namespace NonCascadingCSSRulesEnforcer.Rules.Compatibility
 		/// This will throw an exception if the specified rule BrokenRuleEncounteredException is broken. It will throw an ArgumentException for a null fragments
 		/// references, or one which contains a null reference.
 		/// </summary>
-        public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
-        {
-            if (fragments == null)
-                throw new ArgumentNullException("fragments");
+		public void EnsureRulesAreMet(IEnumerable<ICSSFragment> fragments)
+		{
+			if (fragments == null)
+				throw new ArgumentNullException("fragments");
 
-            var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
-            if (firstBrokenRuleIfAny != null)
-                throw firstBrokenRuleIfAny;
-        }
+			var firstBrokenRuleIfAny = GetAnyBrokenRules(fragments).FirstOrDefault();
+			if (firstBrokenRuleIfAny != null)
+				throw firstBrokenRuleIfAny;
+		}
 
-        public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
-        {
+		public IEnumerable<BrokenRuleEncounteredException> GetAnyBrokenRules(IEnumerable<ICSSFragment> fragments)
+		{
 			if (fragments == null)
 				throw new ArgumentNullException("fragments");
 
 			var fragmentSet = new CSSFragmentSet(fragments);
 			if (fragmentSet.TotalSelectorCount > MAX_NUMBER_OF_SELECTORS)
-                yield return new LegacyIESelectorLimitMustBeRespectedException(fragmentSet);
+				yield return new LegacyIESelectorLimitMustBeRespectedException(fragmentSet);
 		}
 
 		public class LegacyIESelectorLimitMustBeRespectedException : BrokenRuleEncounteredException

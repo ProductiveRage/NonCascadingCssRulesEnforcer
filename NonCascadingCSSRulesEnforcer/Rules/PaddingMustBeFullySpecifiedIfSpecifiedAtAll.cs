@@ -9,7 +9,9 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 	/// </summary>
 	public class PaddingMustBeFullySpecifiedIfSpecifiedAtAll : PropertyMustBeFullySpecifiedIfSpecifiedAtAll
 	{
-		public PaddingMustBeFullySpecifiedIfSpecifiedAtAll()
+		private static PaddingMustBeFullySpecifiedIfSpecifiedAtAll _instance = PaddingMustBeFullySpecifiedIfSpecifiedAtAll.Instance;
+		public static PaddingMustBeFullySpecifiedIfSpecifiedAtAll Instance => _instance;
+		private PaddingMustBeFullySpecifiedIfSpecifiedAtAll()
 			: base(
 				new[] { "padding-top" },
 				new[] { "padding-left" },

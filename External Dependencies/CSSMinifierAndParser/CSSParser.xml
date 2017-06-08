@@ -63,10 +63,13 @@
             This will never be null
             </summary>
         </member>
-        <member name="M:CSSParser.ContentProcessors.CharacterProcessors.SelectorOrStyleSegment.IsNextWordOneOfThePseudoClasses(CSSParser.StringNavigators.IWalkThroughStrings)">
+        <member name="M:CSSParser.ContentProcessors.CharacterProcessors.SelectorOrStyleSegment.GetPseudoClassHandlingProcessResultIfApplicable(CSSParser.StringNavigators.IWalkThroughStrings)">
             <summary>
-            This will try to determine whether the next word from the given point in the string navigator is a recognised pseudo class. Any whitespace at
-            the current position will be moved over and the content, if any, taken from there.
+            If this next work from the current point in the given string navigator appears to be a recognised pseudo class then this will return a result that
+            will ensure that the current character is identified as a selector-or-property-name content rather than a property-name-value-separator colon (the
+            string navigator passed here will be for the position directly after the colon, which is what is currently being negotiated). Any whitespace at
+            the current position will be moved over when looking for pseudo class content. If the content does not appear to be for a pseudo class then null
+            will be returned and the caller may continue with whatever logic it wants to.
             </summary>
         </member>
         <member name="F:CSSParser.ContentProcessors.CharacterProcessors.SelectorOrStyleSegment.PseudoClasses">

@@ -37,14 +37,21 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CSSMinifier">
-      <HintPath>..\External Dependencies\CSSMinifierAndParser\CSSMinifier.dll</HintPath>
+    <Reference Include="CSSMinifier, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CssMinifier.2.0.0\lib\net4\CSSMinifier.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="CSSParser">
-      <HintPath>..\External Dependencies\CSSMinifierAndParser\CSSParser.dll</HintPath>
+    <Reference Include="CSSParser, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CssParser.1.3.0\lib\CSSParser.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="CSSParser.ExtendedLESSParser">
-      <HintPath>..\External Dependencies\CSSMinifierAndParser\CSSParser.ExtendedLESSParser.dll</HintPath>
+    <Reference Include="CSSParser.ExtendedLESSParser, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CssParser.1.3.0\lib\CSSParser.ExtendedLESSParser.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="dotless.Core, Version=1.4.0.0, Culture=neutral, PublicKeyToken=96b446c9e63eae34, processorArchitecture=MSIL">
+      <HintPath>..\packages\dotless.1.4.0.0\lib\dotless.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

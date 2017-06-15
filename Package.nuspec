@@ -17,7 +17,7 @@
     <files>
         <file src="NonCascadingCSSRulesEnforcer\bin\release\NonCascadingCSSRulesEnforcer.dll" target="lib\net4" />
         <file src="NonCascadingCSSRulesEnforcer\bin\release\NonCascadingCSSRulesEnforcer.xml" target="lib\net4" />
-        <file src="CSSMinifierIntegration\bin\release\CSSMinifierIntegration.dll" target="lib\net4" />
-        <file src="CSSMinifierIntegration\bin\release\CSSMinifierIntegration.xml" target="lib\net4" />
+        <file src="CSSMinifierIntegration\bin\release\NonCascadingCSSRulesEnforcer.CSSMinifierIntegration.dll" target="lib\net4" />
+        <file src="CSSMinifierIntegration\bin\release\NonCascadingCSSRulesEnforcer.CSSMinifierIntegration.xml" target="lib\net4" />
     </files>
 </package>

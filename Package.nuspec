@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>ProductiveRage.NonCascadingCSSRulesEnforcer</id>
+        <version>1.2.0</version>
+        <title>The Non-Cascading-CSS Rules Enforcer</title>
+        <authors>ProductiveRage</authors>
+        <licenseUrl>https://bitbucket.org/DanRoberts/noncascadingcssrulesenforcer/src/6e2218a17eca024b21dcdf475125e8e3f7e4db20/LICENSE.txt</licenseUrl>
+        <projectUrl>https://bitbucket.org/DanRoberts/noncascadingcssrulesenforcer</projectUrl>
+        <iconUrl>https://en.gravatar.com/userimage/25650568/f116011fc5e456142d973c6867b9e712.jpg?size=200</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>A way to analyse LESS style sheets to ensure that they follow the guidelines from "Non-cascading CSS: A revolution!" (see http://www.productiverage.com/noncascading-css-a-revolution)</description>
+        <dependencies>
+          <dependency id="CssMinifier" version="2.0.0" />
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="NonCascadingCSSRulesEnforcer\bin\release\NonCascadingCSSRulesEnforcer.dll" target="lib\net4" />
+    </files>
+</package>

@@ -31,6 +31,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\NonCascadingCSSRulesEnforcer.CSSMinifierIntegration.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CSSMinifier, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">

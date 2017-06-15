@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>ProductiveRage.NonCascadingCSSRulesEnforcer</id>
-        <version>1.2.0</version>
+        <version>1.2.1</version>
         <title>The Non-Cascading-CSS Rules Enforcer</title>
         <authors>ProductiveRage</authors>
         <licenseUrl>https://bitbucket.org/DanRoberts/noncascadingcssrulesenforcer/src/6e2218a17eca024b21dcdf475125e8e3f7e4db20/LICENSE.txt</licenseUrl>
@@ -16,5 +16,8 @@
     </metadata>
     <files>
         <file src="NonCascadingCSSRulesEnforcer\bin\release\NonCascadingCSSRulesEnforcer.dll" target="lib\net4" />
+        <file src="NonCascadingCSSRulesEnforcer\bin\release\NonCascadingCSSRulesEnforcer.xml" target="lib\net4" />
+        <file src="CSSMinifierIntegration\bin\release\CSSMinifierIntegration.dll" target="lib\net4" />
+        <file src="CSSMinifierIntegration\bin\release\CSSMinifierIntegration.xml" target="lib\net4" />
     </files>
 </package>

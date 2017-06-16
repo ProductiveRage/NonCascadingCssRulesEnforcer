@@ -58,6 +58,21 @@ namespace UnitTests.Rules
 			});
 		}
 
+		[Fact]
+		public void SkipValidationOnKeyFramesAnimationContent()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"html",
+				CSSFragmentBuilderSelector.New(
+					"@keyframes AnimateMe",
+					CSSFragmentBuilderSelector.New("0%", CSSFragmentBuilderStyleProperty.New("opacity", "0")),
+					CSSFragmentBuilderSelector.New("100%", CSSFragmentBuilderStyleProperty.New("opacity", "1"))
+				)
+			).ToContainerFragment();
+
+			(new NoBareSelectorsInNonResetsOrThemeSheets(NoBareSelectorsInNonResetsOrThemeSheets.ScopeRestrictingHtmlTagBehaviourOptions.Allow)).EnsureRulesAreMet(new[] { content });
+		}
+
 		[Theory, MemberData("GetAnyBrokenRulesAllowContent")]
 		public void GetAnyBrokenRulesAllowCount(int Id, ICSSFragment content, int expectedErrors)
 		{
@@ -73,8 +88,8 @@ namespace UnitTests.Rules
 			{
 				return new[]
 				{
-					new object[] {1,CSSFragmentBuilderSelector.New("html").ToContainerFragment(),0},
-					new object[] {2,CSSFragmentBuilderSelector.New("html", CSSFragmentBuilderStyleProperty.New("color", "black")).ToContainerFragment(),0}
+					new object[] { 1, CSSFragmentBuilderSelector.New("html").ToContainerFragment(), 0 },
+					new object[] { 2, CSSFragmentBuilderSelector.New("html", CSSFragmentBuilderStyleProperty.New("color", "black")).ToContainerFragment(), 0 }
 				};
 			}
 		}

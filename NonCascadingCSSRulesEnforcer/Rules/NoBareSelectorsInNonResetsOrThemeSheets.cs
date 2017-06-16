@@ -75,6 +75,11 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				{
 					if (!selectorFragment.IsScopeRestrictingHtmlTag() || (_scopeRestrictingHtmlTagBehaviour == ScopeRestrictingHtmlTagBehaviourOptions.Disallow))
 					{
+						// Animation "@keyframes" selectors are special cases - not only do we not want to mistakenly identify them as "bare selectors", we also
+						// don't want to investigate their contents (since strings like "from" and "0%" may get mistakenly identified as bare selectors)
+						if (selectorFragment.Selectors.First().Value.StartsWith("@keyframes"))
+							continue;
+
 						if (selectorFragment.Selectors.Any(s => !IsValidSelector(s)))
 							yield return new DisallowBareSelectorsEncounteredException(selectorFragment);
 					}

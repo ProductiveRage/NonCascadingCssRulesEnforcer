@@ -24,8 +24,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// elements which require percentage widths in order to be responsive (such as a horizontal gallery displaying four items at any one time). It also allows any element to
 		/// have width 100% specified since that doesn't sacrifice any predictability.
 		/// </summary>
-		public static AllMeasurementsMustBePixels Recommended => _recommended;
-		private static AllMeasurementsMustBePixels _recommended = new AllMeasurementsMustBePixels(
+		public static AllMeasurementsMustBePixels Recommended { get; } = new AllMeasurementsMustBePixels(
 			ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty | ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
 			new[] { "div", "td", "th", "li" }
 		);
@@ -71,7 +70,19 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 
 			// This can't be applied to compiled stylesheets as the ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypesntageWidthDivs option specifies that img elements
 			// are allowed width:100% if the style is nested within a div that has percentage width (when the rules are compiled or combined this nesting will no longer be possible)
-			return (styleSheetType != StyleSheetTypeOptions.Compiled && styleSheetType != StyleSheetTypeOptions.Combined);
+			if (styleSheetType == StyleSheetTypeOptions.Compiled)
+				return false;
+
+			// Can't apply to combined sheets for the same reason as above
+			if (styleSheetType == StyleSheetTypeOptions.Combined)
+				return false;
+
+			// There may be some dodgy hacks required in the Reset sheet that uses widths that wouldn't be allowed in other places, so skip processing on thoses
+			if (styleSheetType == StyleSheetTypeOptions.Reset)
+				return false;
+
+			// For the other types (ie. Themes and Other), we DO want this rule to run
+			return true;
 		}
 
 		[Flags]

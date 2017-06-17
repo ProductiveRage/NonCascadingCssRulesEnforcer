@@ -37,8 +37,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CSSMinifier, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CssMinifier.2.1.0\lib\net4\CSSMinifier.dll</HintPath>
+    <Reference Include="CSSMinifier, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CssMinifier.2.2.0\lib\net4\CSSMinifier.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CSSParser, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">

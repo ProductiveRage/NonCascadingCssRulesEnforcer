@@ -155,16 +155,12 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 
 				// Generic tests for measurement units
 				var stylePropertyValueFragmentSections = stylePropertyValueFragment.ValueSegments;
-				if ((_conformity & ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty) == ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty)
-				{
-					var stylePropertyValueFragmentCombinedSegments = string.Join(" ", stylePropertyValueFragment.ValueSegments);
-					if ((stylePropertyValueFragmentCombinedSegments == "100%")
-					|| stylePropertyValueFragmentCombinedSegments.Equals("100% !important", StringComparison.OrdinalIgnoreCase))
-						continue;
-				}
 				foreach (var value in stylePropertyValueFragmentSections)
 				{
-					if ((_conformity & ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes) == ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes)
+					if (_conformity.HasFlag(ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty) && (value == "100%"))
+						continue;
+
+					if (_conformity.HasFlag(ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes))
 					{
 						// To get the parent Selector we have to walk backwards up the containers set since this property value could be wrapped in a MediaQuery - eg.
 						// div.Whatever {

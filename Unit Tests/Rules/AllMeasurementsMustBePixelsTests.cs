@@ -240,6 +240,22 @@ namespace UnitTests.Rules
 			AllMeasurementsMustBePixels.Recommended.EnsureRulesAreMet(new[] { content });
 		}
 
+		/// <summary>
+		/// This tests uses the original data from the report that resulted in RecommendedConfigurationAllowsHundredPercentageWidthOnBackgroundPositionAndSize (and this
+		/// data did require a change)
+		/// </summary>
+		[Fact]
+		public void RecommendedConfigurationAllowsHundredPercentageWidthOnBackgroundPositionAndSizeAsMultiPartValue()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"div",
+				CSSFragmentBuilderStyleProperty.New("background-size", "100% -20px"),
+				CSSFragmentBuilderStyleProperty.New("background-position", "100% 19px")
+			).ToContainerFragment();
+
+			AllMeasurementsMustBePixels.Recommended.EnsureRulesAreMet(new[] { content });
+		}
+
 		[Theory, MemberData("GetAnyBrokenRulesErrorCountContent")]
 		public void GetAnyBrokenRulesErrorCount(int Id, ICSSFragment content, int expectedErrors)
 		{

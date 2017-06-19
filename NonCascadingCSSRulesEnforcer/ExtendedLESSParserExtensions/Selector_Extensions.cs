@@ -52,5 +52,14 @@ namespace NonCascadingCSSRulesEnforcer.ExtendedLESSParserExtensions
 
 			return source.Selectors.OnlyTargetsBareSelectors();
 		}
+
+		public static bool IsKeyFrameDeclaration(this Selector source)
+		{
+			if (source == null)
+				throw new ArgumentNullException(nameof(source));
+
+			var firstWord = source.Selectors.First().Value.Split().First();
+			return firstWord.StartsWith("@") && firstWord.EndsWith("keyframes", StringComparison.OrdinalIgnoreCase);
+		}
 	}
 }

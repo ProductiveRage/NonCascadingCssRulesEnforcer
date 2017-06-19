@@ -256,6 +256,24 @@ namespace UnitTests.Rules
 			AllMeasurementsMustBePixels.Recommended.EnsureRulesAreMet(new[] { content });
 		}
 
+		[Fact]
+		public void RecommendedConfigurationSkipsValidatingAnimationsSinceTheyAreOftenGeneric()
+		{
+			var content = CSSFragmentBuilderSelector.New(
+				"@keyframes example",
+				CSSFragmentBuilderSelector.New(
+					"0%",
+					CSSFragmentBuilderStyleProperty.New("top", "45%")
+				),
+				CSSFragmentBuilderSelector.New(
+					"100%",
+					CSSFragmentBuilderStyleProperty.New("top", "50%")
+				)
+			).ToContainerFragment();
+
+			AllMeasurementsMustBePixels.Recommended.EnsureRulesAreMet(new[] { content });
+		}
+
 		[Theory, MemberData("GetAnyBrokenRulesErrorCountContent")]
 		public void GetAnyBrokenRulesErrorCount(int Id, ICSSFragment content, int expectedErrors)
 		{
@@ -290,7 +308,6 @@ namespace UnitTests.Rules
 		}
 
 		// TODO:
-		//  @keyframes
 		//  nested selector that is direct descendent of div selector (or other "special case" elements) and is simple format
 	}
 }

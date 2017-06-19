@@ -77,7 +77,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 					{
 						// Animation "@keyframes" selectors are special cases - not only do we not want to mistakenly identify them as "bare selectors", we also
 						// don't want to investigate their contents (since strings like "from" and "0%" may get mistakenly identified as bare selectors)
-						if (selectorFragment.Selectors.First().Value.StartsWith("@keyframes"))
+						if (selectorFragment.IsKeyFrameDeclaration())
 							continue;
 
 						if (selectorFragment.Selectors.Any(s => !IsValidSelector(s)))

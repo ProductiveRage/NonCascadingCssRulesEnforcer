@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>ProductiveRage.NonCascadingCSSRulesEnforcer</id>
-        <version>1.4.0</version>
+        <version>1.5.0</version>
         <title>The Non-Cascading-CSS Rules Enforcer</title>
         <authors>ProductiveRage</authors>
         <licenseUrl>https://bitbucket.org/DanRoberts/noncascadingcssrulesenforcer/src/6e2218a17eca024b21dcdf475125e8e3f7e4db20/LICENSE.txt</licenseUrl>

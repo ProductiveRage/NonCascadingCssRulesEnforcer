@@ -193,10 +193,25 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 						&& (stylePropertyValueFragment.Property.HasName("width") || _conformity.HasFlag(ConformityOptions.AllowPercentagesOnAllPropertiesOfSpecifiedElementTypes))
 						&& IsPercentageMeasurement(value))
 						{
-							// If the selector for this property targets divs or tds only (eg. "div.Main" or "div.Header div.Logo, div.Footer div.Logo") then allow
-							// percentage widths
+							// If the selector for this property targets divs or tds only (eg. "div.Main" or "div.Header div.Logo, div.Footer div.Logo") then allow the percentage.
+							// This is the simplest work that we might have to do in this loop.
 							if (DoesSelectorTargetOnlyElementsWithTagNames(directParentSelector, _percentageElementTypesIfEnabled))
 								continue;
+
+							// Next, if the selector is a simple parent selector (eg. "&.closed") then we need to check the selector that this is extending in order to see if it's
+							// one of the tags that we will allow percentage widths on. Note that we'll only support simple parent selectors; it must start (and not end) with "&"
+							// and it may only have a single segment (trying to validate "&.closed p div") it too complicated for my liking.
+							if (directParentSelector.Selectors.Any(s => s.Value.StartsWith("&")))
+							{
+								if (directParentSelector.Selectors.All(s => s.Value.StartsWith("&"))
+								&& !directParentSelector.Selectors.Any(s => s.Value.Contains(" "))
+								&& !directParentSelector.Selectors.Any(s => s.Value.EndsWith("&")))
+								{
+									var nextLevelSelector = containers.TakeWhile(c => c != directParentSelector).OfType<Selector>().FirstOrDefault();
+									if ((nextLevelSelector != null) && DoesSelectorTargetOnlyElementsWithTagNames(nextLevelSelector, _percentageElementTypesIfEnabled))
+										continue;
+								}
+							}
 
 							// If the selector for this property targets imgs only then allow "width:100%" values so long as they are inside a div or td with a percentage width
 							if (DoesSelectorTargetOnlyElementsWithTagNames(directParentSelector, new[] { "img" }))

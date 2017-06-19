@@ -302,12 +302,20 @@ namespace UnitTests.Rules
 					new object[] { 10, CSSFragmentBuilderSelector.New("p", CSSFragmentBuilderStyleProperty.New("width", "percentage(0.1)")).ToContainerFragment(), 1 },
 					new object[] { 11, CSSFragmentBuilderSelector.New("a", CSSFragmentBuilderStyleProperty.New("width", "100% !important")).ToContainerFragment(), 0 },
 					new object[] { 12, CSSFragmentBuilderSelector.New("div", CSSFragmentBuilderStyleProperty.New("margin", "10pt 10pt 15px 0;")).ToContainerFragment(), 2 },
-					new object[] { 13, CSSFragmentBuilderSelector.New("div", CSSFragmentBuilderStyleProperty.New("top", "50%")).ToContainerFragment(), 0 } // Recommended configuration allows any %age property for div
+					new object[] { 13, CSSFragmentBuilderSelector.New("div", CSSFragmentBuilderStyleProperty.New("top", "50%")).ToContainerFragment(), 0 }, // Recommended configuration allows any %age property for div
+
+					// Allow percentage width in "&.hover" if within a "div" (one of the Recommended allow-percentage-property special cases)
+					new object[] { 14, CSSFragmentBuilderSelector.New("div.wrapper", CSSFragmentBuilderSelector.New("&.hover", CSSFragmentBuilderStyleProperty.New("width", "50%"))).ToContainerFragment(), 0 },
+					// Don't allow percentage width in "&.hover" if within a "p" (not one of the Recommended allow-percentage-property special cases)
+					new object[] { 15, CSSFragmentBuilderSelector.New("p.wrapper", CSSFragmentBuilderSelector.New("&.hover", CSSFragmentBuilderStyleProperty.New("width", "50%"))).ToContainerFragment(), 1 },
+					// Don't allow percentage width in more complex parent selector; what will ".hover &" be interpreted as? Too hard to tell.
+					new object[] { 16, CSSFragmentBuilderSelector.New("div.wrapper", CSSFragmentBuilderSelector.New(".hover &", CSSFragmentBuilderStyleProperty.New("width", "50%"))).ToContainerFragment(), 1 },
+					// The special case handling for parent selectors will work with multiple selectors so long as each one abides by the "simple parent selector" guidelines
+					new object[] { 17, CSSFragmentBuilderSelector.New("div.wrapper", CSSFragmentBuilderSelector.New("&.hover, &.somethingelse", CSSFragmentBuilderStyleProperty.New("width", "50%"))).ToContainerFragment(), 0 },
+					// If any parent selector entry doesn't meet the requirements then the entire rule is inelligible
+					new object[] { 18, CSSFragmentBuilderSelector.New("div.wrapper", CSSFragmentBuilderSelector.New("&.hover, &.somethingelse p", CSSFragmentBuilderStyleProperty.New("width", "50%"))).ToContainerFragment(), 1 },
 				};
 			}
 		}
-
-		// TODO:
-		//  nested selector that is direct descendent of div selector (or other "special case" elements) and is simple format
 	}
 }

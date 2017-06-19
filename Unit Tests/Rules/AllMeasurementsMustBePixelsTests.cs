@@ -19,7 +19,7 @@ namespace UnitTests.Rules
 
 			(new AllMeasurementsMustBePixels(
 				AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
-				AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+				AllMeasurementsMustBePixels.RecommendedPercentageExceptions
 			)).EnsureRulesAreMet(new[] { content });
 		}
 
@@ -37,7 +37,7 @@ namespace UnitTests.Rules
 
 				(new AllMeasurementsMustBePixels(
 					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
-					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+					AllMeasurementsMustBePixels.RecommendedPercentageExceptions
 				)).EnsureRulesAreMet(new[] { content });
 		}
 
@@ -58,7 +58,7 @@ namespace UnitTests.Rules
 
 				(new AllMeasurementsMustBePixels(
 					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
-					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+					AllMeasurementsMustBePixels.RecommendedPercentageExceptions
 				)).EnsureRulesAreMet(new[] { content });
 		}
 
@@ -80,7 +80,7 @@ namespace UnitTests.Rules
 
 				(new AllMeasurementsMustBePixels(
 					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
-					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+					AllMeasurementsMustBePixels.RecommendedPercentageExceptions
 				)).EnsureRulesAreMet(new[] { content });
 		}
 
@@ -96,7 +96,7 @@ namespace UnitTests.Rules
 			{
 				(new AllMeasurementsMustBePixels(
 					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
-					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+					AllMeasurementsMustBePixels.RecommendedPercentageExceptions
 				)).EnsureRulesAreMet(new[] { content });
 			});
 		}
@@ -117,7 +117,7 @@ namespace UnitTests.Rules
 			{
 				(new AllMeasurementsMustBePixels(
 					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
-					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+					AllMeasurementsMustBePixels.RecommendedPercentageExceptions
 				)).EnsureRulesAreMet(new[] { content });
 			});
 		}
@@ -134,7 +134,7 @@ namespace UnitTests.Rules
 			{
 				(new AllMeasurementsMustBePixels(
 					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
-					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+					AllMeasurementsMustBePixels.RecommendedPercentageExceptions
 				)).EnsureRulesAreMet(new[] { content });
 			});
 		}
@@ -151,7 +151,7 @@ namespace UnitTests.Rules
 			{
 				(new AllMeasurementsMustBePixels(
 					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
-					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+					AllMeasurementsMustBePixels.RecommendedPercentageExceptions
 				)).EnsureRulesAreMet(new[] { content });
 			});
 		}
@@ -170,7 +170,7 @@ namespace UnitTests.Rules
 
 				(new AllMeasurementsMustBePixels(
 					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
-					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+					AllMeasurementsMustBePixels.RecommendedPercentageExceptions
 				)).EnsureRulesAreMet(new[] { content });
 		}
 
@@ -189,7 +189,7 @@ namespace UnitTests.Rules
 			{
 				(new AllMeasurementsMustBePixels(
 					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
-					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions
+					AllMeasurementsMustBePixels.RecommendedPercentageExceptions
 				)).EnsureRulesAreMet(new[] { content });
 			});
 		}
@@ -261,10 +261,7 @@ namespace UnitTests.Rules
 		{
 			Assert.Equal(
 				expectedErrors,
-				(new AllMeasurementsMustBePixels(
-					AllMeasurementsMustBePixels.ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
-					AllMeasurementsMustBePixels.RecommendedPercentageWidthExceptions)
-				).GetAnyBrokenRules(new[] { content }).Count()
+				AllMeasurementsMustBePixels.Recommended.GetAnyBrokenRules(new[] { content }).Count()
 			);
 		}
 
@@ -274,20 +271,26 @@ namespace UnitTests.Rules
 			{
 				return new[]
 				{
-					new object[] {1,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("width", "50%")).ToContainerFragment(),0 },
-					new object[] {2,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("width", "50%"),CSSFragmentBuilderSelector.New("img",CSSFragmentBuilderStyleProperty.New("width", "100%"))).ToContainerFragment(),0},
-					new object[] {3,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("width", "50%"),CSSFragmentBuilderSelector.New("p",CSSFragmentBuilderSelector.New("img",CSSFragmentBuilderStyleProperty.New("width", "100%")))).ToContainerFragment(),0},
-					new object[] {4,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("width", "50%"),CSSFragmentBuilderSelector.New("p",CSSFragmentBuilderSelector.New("img",CSSFragmentBuilderStyleProperty.New("width", "100%")))).ToContainerFragment(),0},
-					new object[] {5,CSSFragmentBuilderSelector.New("img",CSSFragmentBuilderStyleProperty.New("width", "100%")).ToContainerFragment(),1},
-					new object[] {6,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("width", "50%"),CSSFragmentBuilderSelector.New("img",CSSFragmentBuilderStyleProperty.New("width", "80%"))).ToContainerFragment(),1},
-					new object[] {7,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("border", "0.5em solid black")).ToContainerFragment() ,1},
-					new object[] {8,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("border", "thick solid black")).ToContainerFragment() ,1},
-					new object[] {9,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("margin", "0 auto")).ToContainerFragment() ,0},
-					new object[] {10,CSSFragmentBuilderSelector.New("p",CSSFragmentBuilderStyleProperty.New("width", "percentage(0.1)")).ToContainerFragment() ,1},
-					new object[] {11,CSSFragmentBuilderSelector.New("a",CSSFragmentBuilderStyleProperty.New("width", "100% !important")).ToContainerFragment() ,1},
-					new object[] {12,CSSFragmentBuilderSelector.New("div",CSSFragmentBuilderStyleProperty.New("margin", "10pt 10pt 15px 0;")).ToContainerFragment() ,1}
+					new object[] { 0, CSSFragmentBuilderSelector.New("div", CSSFragmentBuilderStyleProperty.New("width", "50%")).ToContainerFragment(), 0 },
+					new object[] { 1, CSSFragmentBuilderSelector.New("div", CSSFragmentBuilderStyleProperty.New("width", "50%"), CSSFragmentBuilderSelector.New("img", CSSFragmentBuilderStyleProperty.New("width", "100%"))).ToContainerFragment(), 0 },
+					new object[] { 2, CSSFragmentBuilderSelector.New("div", CSSFragmentBuilderStyleProperty.New("width", "50%"), CSSFragmentBuilderSelector.New("p", CSSFragmentBuilderSelector.New("img", CSSFragmentBuilderStyleProperty.New("width", "100%")))).ToContainerFragment(), 0 },
+					new object[] { 3, CSSFragmentBuilderSelector.New("div", CSSFragmentBuilderStyleProperty.New("width", "50%"), CSSFragmentBuilderSelector.New("p", CSSFragmentBuilderSelector.New("img", CSSFragmentBuilderStyleProperty.New("width", "100%")))).ToContainerFragment(), 0 },
+					new object[] { 4, CSSFragmentBuilderSelector.New("img", CSSFragmentBuilderStyleProperty.New("width", "99%")).ToContainerFragment(), 1 },
+					new object[] { 5, CSSFragmentBuilderSelector.New("img", CSSFragmentBuilderStyleProperty.New("width", "100%")).ToContainerFragment(), 0 },
+					new object[] { 6, CSSFragmentBuilderSelector.New("div", CSSFragmentBuilderStyleProperty.New("width", "50%"), CSSFragmentBuilderSelector.New("img", CSSFragmentBuilderStyleProperty.New("width", "80%"))).ToContainerFragment(), 1 },
+					new object[] { 7, CSSFragmentBuilderSelector.New("div", CSSFragmentBuilderStyleProperty.New("border", "0.5em solid black")).ToContainerFragment(), 1 },
+					new object[] { 8, CSSFragmentBuilderSelector.New("div", CSSFragmentBuilderStyleProperty.New("border", "thick solid black")).ToContainerFragment(), 1 },
+					new object[] { 9, CSSFragmentBuilderSelector.New("div", CSSFragmentBuilderStyleProperty.New("margin", "0 auto")).ToContainerFragment(), 0 },
+					new object[] { 10, CSSFragmentBuilderSelector.New("p", CSSFragmentBuilderStyleProperty.New("width", "percentage(0.1)")).ToContainerFragment(), 1 },
+					new object[] { 11, CSSFragmentBuilderSelector.New("a", CSSFragmentBuilderStyleProperty.New("width", "100% !important")).ToContainerFragment(), 0 },
+					new object[] { 12, CSSFragmentBuilderSelector.New("div", CSSFragmentBuilderStyleProperty.New("margin", "10pt 10pt 15px 0;")).ToContainerFragment(), 2 },
+					new object[] { 13, CSSFragmentBuilderSelector.New("div", CSSFragmentBuilderStyleProperty.New("top", "50%")).ToContainerFragment(), 0 } // Recommended configuration allows any %age property for div
 				};
 			}
 		}
+
+		// TODO:
+		//  @keyframes
+		//  nested selector that is direct descendent of div selector (or other "special case" elements) and is simple format
 	}
 }

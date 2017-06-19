@@ -26,7 +26,8 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// </summary>
 		public static AllMeasurementsMustBePixels Recommended { get; } = new AllMeasurementsMustBePixels(
 			ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty |
-			ConformityOptions.AllowPercentagesOnAllPropertiesOfSpecifiedElementTypes,
+			ConformityOptions.AllowPercentagesOnAllPropertiesOfSpecifiedElementTypes |
+			ConformityOptions.DoNotValidateKeyFramesProperties,
 			new[] { "div", "td", "th", "li" }
 		);
 
@@ -111,7 +112,13 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			/// width:100%, the recommended element types for this option are div, td and th - this set is exposed through the static RecommendedPercentageWidthExceptions property.
 			/// Note that this takes incorporate the AllowPercentageWidthsOnSpecifiedElementTypes behaviour.
 			/// </summary>
-			AllowPercentagesOnAllPropertiesOfSpecifiedElementTypes = 5 // 5 = 1 + 4 = AllowOneHundredPercentOnAnyElementAndProperty plus some more relaxing behaviour
+			AllowPercentagesOnAllPropertiesOfSpecifiedElementTypes = 5, // 5 = 1 + 4 = AllowOneHundredPercentOnAnyElementAndProperty plus some more relaxing behaviour
+
+			/// <summary>
+			/// Animations often use percentages for positioning (as they and will often be sufficiently generic that the precise measurements to use won't be known) and so it may
+			/// be desirable to skip all validation within @keyframes declarations
+			/// </summary>
+			DoNotValidateKeyFramesProperties = 8
 		}
 
 		/// <summary>
@@ -161,7 +168,10 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				var stylePropertyValueFragment = fragment as StylePropertyValue;
 				if (stylePropertyValueFragment == null)
 					continue;
-					
+
+				if (_conformity.HasFlag(ConformityOptions.DoNotValidateKeyFramesProperties) && containers.OfType<Selector>().Any(s => s.IsKeyFrameDeclaration()))
+					continue;
+
 				// Generic tests for measurement units
 				var stylePropertyValueFragmentSections = stylePropertyValueFragment.ValueSegments;
 				foreach (var value in stylePropertyValueFragmentSections)

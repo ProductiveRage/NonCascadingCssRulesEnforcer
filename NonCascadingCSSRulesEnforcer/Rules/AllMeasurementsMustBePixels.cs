@@ -9,9 +9,9 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 {
 	/// <summary>
 	/// This rule applies to all stylesheets. Measurements all be specified in pixels (no use of em, rem, mm, etc..). Note that these units ARE allowed in media queries but not
-	/// in styles for elements. This rule can be relaxed to allow certain elements that have percentage widths specified and for any images whose styles are nested within styles
-	/// for those elements to have width 100%.
-	/// If it is relaxed then it is recommended that only div, th and td elements are allowed percentage width. The first because a div element may be a container element used
+	/// in styles for elements. This rule can be relaxed to allow certain elements that have percentage widths specified (or any certain elements to have any percentage property
+	/// specified ) and for any images whose styles are nested within styles for those elements to have width 100%.
+	/// If it is relaxed then it is recommended that only div, li, th and td elements are allowed percentage properties. The first because a div element may be a container element used
 	/// for layout (in HTML5 divs are still appropriate as containers if no semantic meaning is attached - see http://webdesign.about.com/od/html5tags/a/when-to-use-section-element.htm)
 	/// while table cell elements do not abide by the same rules for layout that other elements do, it's valid to arrange the columns and fit the data around that rather than trying
 	/// to fit layout around content. Also see http://www.productiverage.com/Read/46 for more justification of the relaxation of this rule.
@@ -19,19 +19,20 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 	public class AllMeasurementsMustBePixels : IEnforceRules
 	{
 		/// <summary>
-		/// The recommended configuration allows percentage widths on div, th, td and li elements since it's common to use them for layout - for your own use you may wish to be
+		/// The recommended configuration allows percentage properties on div, th, td and li elements since it's common to use them for layout - for your own use you may wish to be
 		/// stricter or more relaxed (allow percentage widths on fewer or more elements). Using only pixel widths makes everything much more predictable but there are some layout
 		/// elements which require percentage widths in order to be responsive (such as a horizontal gallery displaying four items at any one time). It also allows any element to
 		/// have width 100% specified since that doesn't sacrifice any predictability.
 		/// </summary>
 		public static AllMeasurementsMustBePixels Recommended { get; } = new AllMeasurementsMustBePixels(
-			ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty | ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes,
+			ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty |
+			ConformityOptions.AllowPercentagesOnAllPropertiesOfSpecifiedElementTypes,
 			new[] { "div", "td", "th", "li" }
 		);
 
 		private readonly ConformityOptions _conformity;
-		private readonly IEnumerable<string> _percentageWidthElementTypesIfEnabled;
-		public AllMeasurementsMustBePixels(ConformityOptions conformity, IEnumerable<string> percentageWidthElementTypesIfEnabled)
+		private readonly IEnumerable<string> _percentageElementTypesIfEnabled;
+		public AllMeasurementsMustBePixels(ConformityOptions conformity, IEnumerable<string> percentageElementTypesIfEnabled)
 		{
 			var allCombinedConformityOptionValues = 0;
 			foreach (int conformityOptionValue in Enum.GetValues(typeof(ConformityOptions)))
@@ -39,20 +40,21 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			if ((allCombinedConformityOptionValues | (int)conformity) != allCombinedConformityOptionValues)
 				throw new ArgumentOutOfRangeException("conformity");
 
-			_percentageWidthElementTypesIfEnabled = (percentageWidthElementTypesIfEnabled ?? new string[0])
+			_percentageElementTypesIfEnabled = (percentageElementTypesIfEnabled ?? new string[0])
 				.Select(tagName => tagName.Trim().ToUpper())
 				.Distinct()
 				.ToArray();
-			if (_percentageWidthElementTypesIfEnabled.Any(tagName => tagName == ""))
-				throw new ArgumentException("Null/blank entry encountered in percentageWidthElementTypesIfEnabled set");
+			if (_percentageElementTypesIfEnabled.Any(tagName => tagName == ""))
+				throw new ArgumentException("Null/blank entry encountered in percentageElementTypesIfEnabled set");
 
-			if ((conformity & ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes) == ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes)
+			if (conformity.HasFlag(ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes)
+			|| conformity.HasFlag(ConformityOptions.AllowPercentagesOnAllPropertiesOfSpecifiedElementTypes))
 			{
-				if (!_percentageWidthElementTypesIfEnabled.Any())
-					throw new ArgumentException("percentageWidthElementTypesIfEnabled must have at least one value if AllowPercentageWidthsOnSpecifiedElementTypes is enabled");
+				if (!_percentageElementTypesIfEnabled.Any())
+					throw new ArgumentException("percentageElementTypesIfEnabled must have at least one value if AllowPercentageWidthsOnSpecifiedElementTypes is enabled");
 			}
-			else if (_percentageWidthElementTypesIfEnabled.Any())
-				throw new ArgumentException("percentageWidthElementTypesIfEnabled may not have any values specified if AllowPercentageWidthsOnSpecifiedElementTypes is not enabled");
+			else if (_percentageElementTypesIfEnabled.Any())
+				throw new ArgumentException("percentageElementTypesIfEnabled may not have any values specified if AllowPercentageWidthsOnSpecifiedElementTypes is not enabled");
 
 			_conformity = conformity;
 		}
@@ -61,7 +63,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 		/// <summary>
 		/// If the ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes behaviour is enabled then these are the recommended exceptions: div, td and th
 		/// </summary>
-		public static IEnumerable<string> RecommendedPercentageWidthExceptions { get { return new[] { "div", "td", "th" }; } }
+		public static IEnumerable<string> RecommendedPercentageExceptions { get { return new[] { "div", "td", "th" }; } }
 
 		public bool DoesThisRuleApplyTo(StyleSheetTypeOptions styleSheetType)
 		{
@@ -94,15 +96,22 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 			Strict = 0,
 
 			/// <summary>
-			/// This will specified element types to have a width with a percentage unit and img elements whose styles are nested within their style blocks to have width:100%,
-			/// the recommended element types for this option are div, td and th - this set is exposed through the static RecommendedPercentageWidthExceptions property
+			/// This will allow the specified element types to have a width with a percentage unit and img elements whose styles are nested within their style blocks to have
+			/// width:100%, the recommended element types for this option are div, td and th - this set is exposed through the static RecommendedPercentageWidthExceptions property
 			/// </summary>
 			AllowPercentageWidthsOnSpecifiedElementTypes = 1,
 
 			/// <summary>
 			/// This will allow any property to be specified as 100% (acceptable for width or font-size, for example)
 			/// </summary>
-			AllowOneHundredPercentOnAnyElementAndProperty = 2
+			AllowOneHundredPercentOnAnyElementAndProperty = 2,
+
+			/// <summary>
+			/// This will allow the specified element types to have any properties with a percentage unit and img elements whose styles are nested within their style blocks to have
+			/// width:100%, the recommended element types for this option are div, td and th - this set is exposed through the static RecommendedPercentageWidthExceptions property.
+			/// Note that this takes incorporate the AllowPercentageWidthsOnSpecifiedElementTypes behaviour.
+			/// </summary>
+			AllowPercentagesOnAllPropertiesOfSpecifiedElementTypes = 5 // 5 = 1 + 4 = AllowOneHundredPercentOnAnyElementAndProperty plus some more relaxing behaviour
 		}
 
 		/// <summary>
@@ -152,7 +161,7 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 				var stylePropertyValueFragment = fragment as StylePropertyValue;
 				if (stylePropertyValueFragment == null)
 					continue;
-
+					
 				// Generic tests for measurement units
 				var stylePropertyValueFragmentSections = stylePropertyValueFragment.ValueSegments;
 				foreach (var value in stylePropertyValueFragmentSections)
@@ -160,7 +169,8 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 					if (_conformity.HasFlag(ConformityOptions.AllowOneHundredPercentOnAnyElementAndProperty) && (value == "100%"))
 						continue;
 
-					if (_conformity.HasFlag(ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes))
+					if (_conformity.HasFlag(ConformityOptions.AllowPercentageWidthsOnSpecifiedElementTypes)
+					|| _conformity.HasFlag(ConformityOptions.AllowPercentagesOnAllPropertiesOfSpecifiedElementTypes))
 					{
 						// To get the parent Selector we have to walk backwards up the containers set since this property value could be wrapped in a MediaQuery - eg.
 						// div.Whatever {
@@ -169,11 +179,13 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 						//   }
 						// }
 						var directParentSelector = containers.LastOrDefault(c => c is Selector) as Selector;
-						if ((directParentSelector != null) && stylePropertyValueFragment.Property.Value.Equals("width", StringComparison.InvariantCultureIgnoreCase) && IsPercentageMeasurement(value))
+						if ((directParentSelector != null)
+						&& (stylePropertyValueFragment.Property.HasName("width") || _conformity.HasFlag(ConformityOptions.AllowPercentagesOnAllPropertiesOfSpecifiedElementTypes))
+						&& IsPercentageMeasurement(value))
 						{
 							// If the selector for this property targets divs or tds only (eg. "div.Main" or "div.Header div.Logo, div.Footer div.Logo") then allow
 							// percentage widths
-							if (DoesSelectorTargetOnlyElementsWithTagNames(directParentSelector, _percentageWidthElementTypesIfEnabled))
+							if (DoesSelectorTargetOnlyElementsWithTagNames(directParentSelector, _percentageElementTypesIfEnabled))
 								continue;
 
 							// If the selector for this property targets imgs only then allow "width:100%" values so long as they are inside a div or td with a percentage width
@@ -182,33 +194,41 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 								if (IsPercentageMeasurement(value))
 								{
 									if (value != "100%")
+									{
 										yield return new AllMeasurementsMustBePixelsNotAppliedException("The only allow percentage width for img is 100%", fragment);
-
-									// We only need to ensure that the img is nested within an element with a percentage width, we don't have to worry about ensuring that
-									// the selector targets div/tds elements only since this is handled by the above check (that percentage-width styles only target divs)
-									// - Technically this would allow "div.Content { width: 50%; img { width: 100%; img { width: 100%; } } }" but that's not an error case
-									//   since the img tags are still 100% and inside a div with percentage width (it's probably not valid for img tags to be nested but
-									//   that's not a concern for this class)
-									var firstContainerWithPercentageWidth = containers
-										.TakeWhile(c => c != directParentSelector)
-										.SelectMany(s => s.ChildFragments)
-										.Where(f => f is StylePropertyValue)
-										.Cast<StylePropertyValue>()
-										.Where(s => s.Property.HasName("width") && s.GetValueSectionsThatAreMeasurements().All(v => v.Unit == "%"))
-										.FirstOrDefault();
-									if (firstContainerWithPercentageWidth != null)
-										continue;
-
-									yield return new AllMeasurementsMustBePixelsNotAppliedException(
-										"Percentage width for img may is only allowable if nested within a div or td style with percentage width (and the img must have width:100%)",
-										fragment);
-									continue;
+										continue; // We've already rejected this property value, don't bother looking for other ways in which it may be wrong
+									}
+									else
+									{
+										// We only need to ensure that the img is nested within an element with a percentage width, we don't have to worry about ensuring that
+										// the selector targets div/tds elements only since this is handled by the above check (that percentage-width styles only target divs)
+										// - Technically this would allow "div.Content { width: 50%; img { width: 100%; img { width: 100%; } } }" but that's not an error case
+										//   since the img tags are still 100% and inside a div with percentage width (it's probably not valid for img tags to be nested but
+										//   that's not a concern for this class)
+										var firstContainerWithPercentageWidth = containers
+											.TakeWhile(c => c != directParentSelector)
+											.SelectMany(s => s.ChildFragments)
+											.Where(f => f is StylePropertyValue)
+											.Cast<StylePropertyValue>()
+											.Where(s => s.Property.HasName("width") && s.GetValueSectionsThatAreMeasurements().All(v => v.Unit == "%"))
+											.FirstOrDefault();
+										if (firstContainerWithPercentageWidth == null)
+										{
+											yield return new AllMeasurementsMustBePixelsNotAppliedException(
+												"Percentage width for img may is only allowable if nested within a div or td style with percentage width (and the img must have width:100%)",
+												fragment);
+										}
+									}
 								}
+
+								// This concludes our special-case handling with an img width:100% nested within an allowed %age width container, so stop looking for trouble
+								continue;
 							}
 						}
 					}
 
 					// Check for measurements that are a numeric value and a unit string, where the unit string is any other than "px"
+					var encounteredInvalidValue = false;
 					foreach (var disallowedMeasurementUnit in DisallowedMeasurementUnits)
 					{
 						if (!value.EndsWith(disallowedMeasurementUnit, StringComparison.InvariantCultureIgnoreCase))
@@ -218,14 +238,14 @@ namespace NonCascadingCSSRulesEnforcer.Rules
 						if (float.TryParse(value.Substring(0, value.Length - disallowedMeasurementUnit.Length).Trim(), out numericValue))
 						{
 							yield return new AllMeasurementsMustBePixelsNotAppliedException(fragment);
-							yield break;
+							encounteredInvalidValue = true;
+							break;
 						}
 					}
-
-					// If the measurement is a percentage that wasn't caught above then either it's not valid or it uses the "percentage(0.1)" format, either way
-					// it's not allowed at this point
-					if (IsPercentageMeasurement(value))
+					if (!encounteredInvalidValue  && IsPercentageMeasurement(value))
 					{
+						// If the measurement is a percentage that wasn't caught above then either it's not valid or it uses the "percentage(0.1)" format, either way
+						// it's not allowed at this point
 						yield return new AllMeasurementsMustBePixelsNotAppliedException(fragment);
 					}
 				}
